@@ -3,38 +3,62 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <title>ZERO HOUR : Bounty Hunt</title>
-
     <link rel="stylesheet" href="css/style.css" />
   </head>
 
   <body class="center-screen">
+    <div class="scanline"></div>
+
     <div class="start-card">
-      <h1>ZERO HOUR</h1>
-      <p class="subtitle">BOUNTY HUNT</p>
+      <div class="header-box">
+        <h1>ZERO HOUR</h1>
+        <p class="subtitle">BOUNTY HUNT v1.0</p>
+      </div>
 
-      <label for="route-select">Select Your Route</label>
+      <div class="input-group">
+        <label for="team-number">IDENTIFY TEAM NUMBER</label>
+        <input
+          type="number"
+          id="team-number"
+          placeholder="01"
+          min="1"
+          max="5"
+        />
+      </div>
 
-      <select id="route-select">
-        <option value="A">Route A</option>
-        <option value="B">Route B</option>
-        <option value="C">Route C</option>
-        <option value="D">Route D</option>
-        <option value="E">Route E</option>
-      </select>
+      <div class="input-group">
+        <label for="route-select">ASSIGN DEPLOYMENT ROUTE</label>
+        <select id="route-select">
+          <option value="Route A">Route A (Sector Alpha)</option>
+          <option value="Route B">Route B (Sector Beta)</option>
+          <option value="Route C">Route C (Sector Gamma)</option>
+          <option value="Route D">Route D (Sector Delta)</option>
+          <option value="Route E">Route E (Sector Epsilon)</option>
+        </select>
+      </div>
 
-      <button id="start-btn">START HUNT</button>
+      <button id="start-btn">INITIALIZE MISSION</button>
+
+      <p class="warning-text">UNAUTHORIZED ACCESS PROHIBITED</p>
     </div>
 
     <script>
       document
         .getElementById("start-btn")
         .addEventListener("click", function () {
+          const teamNum = document.getElementById("team-number").value;
           const route = document.getElementById("route-select").value;
 
-          localStorage.setItem("route", route);
-          localStorage.setItem("currentNode", 0);
+          if (!teamNum) {
+            alert("ERROR: TEAM IDENTIFICATION REQUIRED");
+            return;
+          }
+
+          // Save mission data
+          localStorage.setItem("bounty_team", teamNum);
+          localStorage.setItem("bounty_route", route);
+          localStorage.setItem("bounty_step", 0); // Start at first node
 
           window.location.href = "hunt.html";
         });

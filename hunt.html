@@ -1,140 +1,106 @@
-<!index.html>
-<html>
+<!doctype html>
+<html lang="en">
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bounty Hunt - AR Scanner</title>
-    <style>
-      body {
-        margin: 0;
-        overflow: hidden;
-        background-color: #000;
-      }
-      #ar-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-      }
-
-      #ui-layer {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background: rgba(0, 0, 0, 0.9);
-        color: #00ff00;
-        font-family: "Courier New", Courier, monospace;
-        z-index: 10;
-        text-align: center;
-      }
-
-      button {
-        padding: 20px 40px;
-        font-size: 20px;
-        background: transparent;
-        color: #00ff00;
-        border: 2px solid #00ff00;
-        cursor: pointer;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        box-shadow: 0 0 10px #00ff00;
-      }
-
-      button:active {
-        background: #00ff00;
-        color: black;
-      }
-
-      #status {
-        margin-top: 20px;
-        font-size: 14px;
-        color: #aaa;
-      }
-    </style>
+    <title>ZERO HOUR - Scanner</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r123/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.4/dist/mindar-image-three.prod.js"></script>
   </head>
-
   <body>
-    <div id="ui-layer">
-      <h1>BOUNTY SYSTEM ONLINE</h1>
-      <button id="startButton">INITIALIZE SCANNER</button>
-      <div id="status">Waiting for user input...</div>
+    <div id="progress-container">
+      <div id="progress-bar"></div>
+      <div id="progress-text">NODE 1/6</div>
+    </div>
+
+    <div id="overlay-container">
+     <div id="intercept-anim" class="hidden">
+    <div class="scanning-line"></div>
+    <div class="glitch-text">⚠ SIGNAL INTERCEPTED</div>
+        <p>Decrypting transmission...</p>
+      </div>
+</div>
+      <div id="riddle-card" class="hidden">
+        <h2 id="riddle-title">DATA DECRYPTED</h2>
+        <p id="riddle-text"></p>
+        <input
+          type="text"
+          id="node-unlock-code"
+          placeholder="ENTER NODE CODE"
+        />
+        <button onclick="unlockNextNode()">SUBMIT AUTH</button>
+      </div>
     </div>
 
     <div id="ar-container"></div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r123/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.4/dist/mindar-image-three.prod.js"></script>
-
+    <script src="js/riddles.js"></script>
     <script>
-      const anchor = mindarThree.addAnchor(0);
+      let currentStep = parseInt(localStorage.getItem("bounty_step")) || 0;
+      const selectedRoute = localStorage.getItem("bounty_route") || "Route A";
 
-      // Add these to see if the scanner is working
-      anchor.onTargetFound = () => {
-        console.log("Target Found!");
-        statusText.innerText = "TARGET ACQUIRED: BOUNTY IDENTIFIED";
-        statusText.style.color = "#00ff00";
+      // Setup MindAR
+      const startScanner = async () => {
+        const mindarThree = new window.MINDAR.IMAGE.MindARThree({
+          container: document.querySelector("#ar-container"),
+          imageTargetSrc: "./markers/targets.mind",
+        });
+        const { renderer, scene, camera } = mindarThree;
+
+        // Anchor for Target Detection
+        const anchor = mindarThree.addAnchor(0);
+        anchor.onTargetFound = () => {
+          showIntercept();
+        };
+
+        await mindarThree.start();
+        renderer.setAnimationLoop(() => {
+          renderer.render(scene, camera);
+        });
       };
 
-      anchor.onTargetLost = () => {
-        console.log("Target Lost");
-        statusText.innerText = "SCANNING FOR SIGNALS...";
-        statusText.style.color = "#aaa";
-      };
+      function showIntercept() {
+        document.getElementById("intercept-anim").classList.remove("hidden");
+        setTimeout(() => {
+          document.getElementById("intercept-anim").classList.add("hidden");
+          showRiddle();
+        }, 3000); // 3-second animation
+      }
 
-      // ... keep your geometry and mesh code below this
-      const startButton = document.querySelector("#startButton");
-      const statusText = document.querySelector("#status");
-      const uiLayer = document.querySelector("#ui-layer");
+      function showRiddle() {
+        const nodeKey = routeSteps[selectedRoute][currentStep];
+        document.getElementById("riddle-text").innerText =
+          riddles[nodeKey][selectedRoute];
+        document.getElementById("riddle-card").classList.remove("hidden");
+      }
 
-      startButton.addEventListener("click", async () => {
-        statusText.innerText = "Requesting Camera Access...";
+      function unlockNextNode() {
+        const input = document
+          .getElementById("node-unlock-code")
+          .value.toUpperCase();
+        const currentNodeKey = routeSteps[selectedRoute][currentStep];
 
-        try {
-          const mindarThree = new window.MINDAR.IMAGE.MindARThree({
-            container: document.querySelector("#ar-container"),
-            // Ensure this path is correct relative to your hunt.html
-            imageTargetSrc: "./markers/targets.mind",
-          });
-
-          const { renderer, scene, camera } = mindarThree;
-
-          // Add lighting
-          const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
-          scene.add(light);
-
-          // Add content to the first target (index 0)
-          const anchor = mindarThree.addAnchor(0);
-          const geometry = new THREE.PlaneGeometry(1, 1);
-          const material = new THREE.MeshBasicMaterial({
-            color: 0x00ff00,
-            transparent: true,
-            opacity: 0.5,
-            side: THREE.DoubleSide,
-          });
-          const plane = new THREE.Mesh(geometry, material);
-          anchor.group.add(plane);
-
-          // Start MindAR
-          await mindarThree.start();
-
-          // If start() succeeds, hide the UI
-          uiLayer.style.display = "none";
-
-          renderer.setAnimationLoop(() => {
-            renderer.render(scene, camera);
-          });
-        } catch (error) {
-          console.error("AR Initialization Error:", error);
-          statusText.style.color = "red";
-          statusText.innerText = "ERROR: " + error.message;
+        if (input === nodeCodes[currentNodeKey]) {
+          currentStep++;
+          localStorage.setItem("bounty_step", currentStep);
+          if (currentStep >= 6) {
+            window.location.href = "final.html";
+          } else {
+            location.reload(); // Reset for next marker
+          }
+        } else {
+          alert("ACCESS DENIED: INVALID CODE");
         }
-      });
+      }
+
+      // Update Progress Bar on Load
+      window.onload = () => {
+        const progress = (currentStep / 6) * 100;
+        document.getElementById("progress-bar").style.width = progress + "%";
+        document.getElementById("progress-text").innerText =
+          `NODE ${currentStep + 1}/6`;
+        startScanner();
+      };
     </script>
   </body>
 </html>

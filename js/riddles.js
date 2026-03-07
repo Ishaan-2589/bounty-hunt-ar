@@ -1,43 +1,10 @@
 const riddles = {
-
-A:{
-A:"Cars sleep here before the hunt begins.",
-B:"First place you entered the building.",
-C:"Food and chatter fill this place.",
-D:"Speeches echo here.",
-E:"Classes happen upstairs."
-},
-
-B:{
-A:"Vehicles wait before journeys begin.",
-B:"Entry point of the building.",
-C:"Where hunger disappears.",
-D:"Where audiences gather.",
-E:"Students study upstairs."
-},
-
-C:{
-A:"Where wheels rest.",
-B:"People gather before moving inside.",
-C:"Snacks and noise everywhere.",
-D:"Stage and seats await.",
-E:"Rooms of learning above."
-},
-
-D:{
-A:"Metal machines parked together.",
-B:"The building welcomes you here.",
-C:"Food is served here.",
-D:"Events take place here.",
-E:"Learning spaces upstairs."
-},
-
-E:{
-A:"Cars and bikes stay here.",
-B:"Lobby of the building.",
-C:"Smell of snacks.",
-D:"Big hall for events.",
-E:"Rooms filled with students."
-}
-
+  "A": { // Parking
+    "Route A": "CRITICAL: SIGNAL TRACED TO THE SECTOR OF ROLLING GIANTS. FIND THE ARCHWAY WHERE THE RUBBER MEETS THE CONCRETE. THE NEXT DATA PACKET IS HIDDEN AT THE GROUND FLOOR LOBBY.",
+    "Route B": "NEMESIS INTERCEPT: PARKING SECTOR BREACHED. SEEK THE LOWEST LEVEL TO FIND THE NEXT UPLINK.",
+    "Route C": "ENCRYPTED: TRANSMISSION DETECTED NEAR THE EXHAUST VENTS. PROCEED TO THE PARKING BAYS.",
+    "Route D": "SYSTEM ALERT: HARDWARE DETECTED IN THE OPEN AIR STAGING AREA. SEARCH THE PARKING LOT.",
+    "Route E": "NODE ALPHA FOUND: THE ROADS END HERE. SCAN THE MARKER NEAR THE PARKING ENTRANCE."
+  }
+  // B, C, D, E, F will follow this pattern
 };

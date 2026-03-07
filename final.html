@@ -1,53 +1,84 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ZERO HOUR : Final Shutdown</title>
     <link rel="stylesheet" href="css/style.css" />
   </head>
+  <body class="center-screen">
+    <div class="scanline"></div>
 
-  <body>
-    <h1>FINAL SHUTDOWN</h1>
+    <div class="final-card">
+      <div class="header-box">
+        <h1>TERMINAL ACCESS</h1>
+        <p class="subtitle">NEMESIS CORE SHUTDOWN</p>
+      </div>
 
-    <input id="k1" placeholder="Enter Key 1" />
-    <br /><br />
+      <div class="key-input">
+        <label>ENCRYPTION KEY 01 (ROUND 1)</label>
+        <input id="k1" placeholder="Enter Key 1" oninput="checkKey1()" />
+      </div>
 
-    <input id="k2" placeholder="Enter Key 2" disabled />
-    <br /><br />
+      <div class="key-input">
+        <label>ENCRYPTION KEY 02 (ROUND 2)</label>
+        <input id="k2" placeholder="LOCKED" disabled oninput="checkKey2()" />
+      </div>
 
-    <input id="k3" placeholder="Enter Final Key" disabled />
+      <div class="key-input">
+        <label>FINAL SHUTDOWN KEY (NODE F)</label>
+        <input id="k3" placeholder="LOCKED" disabled />
+      </div>
 
-    <br /><br />
+      <button id="final-btn" onclick="verifyFinal()">EXECUTE SHUTDOWN</button>
 
-    <button onclick="verify()">SUBMIT</button>
-
-    <p id="result"></p>
+      <p id="result" class="warning-text">AWAITING AUTHORIZATION...</p>
+    </div>
 
     <script>
       const key1 = "ALPHA";
       const key2 = "OMEGA";
       const key3 = "SHADOW";
 
-      function verify() {
-        let k1 = document.getElementById("k1").value;
+      // Auto-unlock Key 2
+      function checkKey1() {
+        const val = document.getElementById("k1").value.toUpperCase();
+        if (val === key1) {
+          const k2 = document.getElementById("k2");
+          k2.disabled = false;
+          k2.placeholder = "Enter Key 2";
+          k2.focus();
+          document.getElementById("result").innerText =
+            "KEY 01 ACCEPTED. UNLOCKING 02...";
+        }
+      }
 
-        if (k1 === key1) {
-          document.getElementById("k2").disabled = false;
+      // Auto-unlock Key 3
+      function checkKey2() {
+        const val = document.getElementById("k2").value.toUpperCase();
+        if (val === key2) {
+          const k3 = document.getElementById("k3");
+          k3.disabled = false;
+          k3.placeholder = "Enter Final Key";
+          k3.focus();
+          document.getElementById("result").innerText =
+            "KEY 02 ACCEPTED. UNLOCKING FINAL...";
+        }
+      }
+
+      // Final Verification
+      function verifyFinal() {
+        const val3 = document.getElementById("k3").value.toUpperCase();
+        const result = document.getElementById("result");
+
+        if (val3 === key3) {
+          result.innerHTML =
+            "<span class='success-msg'>ROGUE AI SHUTDOWN COMPLETE. BOUNTY CLAIMED.</span>";
+          document.getElementById("final-btn").style.display = "none";
+          // Optional: Clear local storage to reset game
+          localStorage.clear();
         } else {
-          alert("Incorrect Key 1");
-          return;
-        }
-
-        let k2 = document.getElementById("k2").value;
-
-        if (k2 === key2) {
-          document.getElementById("k3").disabled = false;
-        }
-
-        let k3 = document.getElementById("k3").value;
-
-        if (k3 === key3) {
-          document.getElementById("result").innerHTML =
-            "ROGUE AI SHUTDOWN COMPLETE. BOUNTY CLAIMED.";
+          result.innerText = "ACCESS DENIED: FINAL AUTHENTICATION FAILED.";
         }
       }
     </script>
