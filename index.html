@@ -35,26 +35,47 @@
       <p class="warning-text">SYSTEM READY. AWAITING INPUT.</p>
     </div></form>
 
-    <script>
-      document.getElementById("start-btn").addEventListener("click", () => {
+   <script>
+    // We target the form itself to handle both button clicks and "Enter" key presses
+    document.getElementById("start-btn").addEventListener("click", (e) => {
+        // 1. Prevent the form from refreshing the page
+        e.preventDefault(); 
+        
+        console.log("Button Clicked...");
+
         const team = document.getElementById("team-number").value;
         const route = document.getElementById("route-select").value;
 
-        if (!team) {
-          alert("TEAM ID REQUIRED");
-          return;
+        // 2. Validation Check
+        if (!team || team.trim() === "") { 
+            alert("ERROR: TEAM IDENTIFICATION REQUIRED"); 
+            return; 
+        }
+        if (route === "") {
+            alert("ERROR: ROUTE ASSIGNMENT REQUIRED");
+            return;
         }
 
-        // Clear any old game data
-        localStorage.clear();
+        console.log("Saving data for Team:", team, "on", route);
 
-        // Save new mission data
-        localStorage.setItem("bounty_team", team);
-        localStorage.setItem("bounty_route", route);
-        localStorage.setItem("bounty_step", 0);
+        try {
+            // 3. Clear old "Rogue AI" data
+            localStorage.clear();
 
-        window.location.href = "hunt.html";
-      });
-    </script>
+            // 4. Save new mission data
+            localStorage.setItem("bounty_team", team);
+            localStorage.setItem("bounty_route", route);
+            localStorage.setItem("bounty_step", 0);
+
+            console.log("Redirecting to hunt.html...");
+            
+            // 5. Perform the redirect
+            window.location.href = "hunt.html";
+        } catch (err) {
+            console.error("LocalStorage Error:", err);
+            alert("Browser storage error. Disable private mode.");
+        }
+    });
+</script>
   </body>
 </html>
