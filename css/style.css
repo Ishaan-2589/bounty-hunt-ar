@@ -177,7 +177,7 @@ button:hover {
 }
 
 .warning-text {
-    font-size: 0.6rem;
+    font-size: 0.8rem;
     color: #ff0000;
     margin-top: 20px;
     opacity: 0.8;
@@ -225,4 +225,24 @@ button:hover {
     border-left: 5px solid #00ff00; /* Hacker accent */
     padding-left: 20px;
     background: linear-gradient(to right, rgba(0,40,0,0.9), rgba(0,0,0,0.9));
+}
+/* Special highlight for the final instruction */
+.overseer-call {
+    display: block;
+    margin-top: 25px;
+    padding: 10px;
+    background: rgba(255, 215, 0, 0.15); /* Faint gold glow background */
+    border: 1px solid #ffd700;
+    color: #ff0000;
+    font-weight: bold;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    animation: alert-blink 1.5s infinite; /* Make it pulse */
+}
+
+@keyframes alert-blink {
+    0% { opacity: 1; box-shadow: 0 0 5px #ffd700; }
+    50% { opacity: 0.5; box-shadow: 0 0 15px #ffd700; }
+    100% { opacity: 1; box-shadow: 0 0 5px #ffd700; }
 }

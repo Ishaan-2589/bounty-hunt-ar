@@ -12,21 +12,21 @@
     <div class="final-card" id="main-card">
       <div class="header-box">
         <h1>TERMINAL ACCESS</h1>
-        <p class="subtitle">NEMESIS CORE SHUTDOWN</p>
+        <p class="subtitle">ROGUE AI CORE SHUTDOWN</p>
       </div>
 
       <div class="key-input">
-        <label>ENCRYPTION KEY 01</label>
+        <label>ENCRYPTION KEY 01 (ROUND 1)</label>
         <input id="k1" placeholder="Enter Key 1" oninput="checkKey1()" />
       </div>
 
       <div class="key-input">
-        <label>ENCRYPTION KEY 02</label>
+        <label>ENCRYPTION KEY 02 (ROUND 2)</label>
         <input id="k2" placeholder="LOCKED" disabled oninput="checkKey2()" />
       </div>
 
       <div class="key-input">
-        <label>FINAL SHUTDOWN KEY</label>
+        <label>FINAL SHUTDOWN KEY (NODE F)</label>
         <input id="k3" placeholder="LOCKED" disabled />
       </div>
 
@@ -41,7 +41,7 @@
         <span class="bounty-badge">◈</span>
 
         <h1 class="gold-text">BOUNTY CLAIMED</h1>
-        <p class="subtitle" style="color: #ffd700">NEMESIS CORE: LIQUIDATED</p>
+        <p class="subtitle" style="color: #ffd700">ROGUE AI: LIQUIDATED</p>
 
         <div class="token-container">
           <p style="margin: 0 0 10px 0; font-size: 0.7rem; letter-spacing: 2px">
@@ -69,11 +69,12 @@
           style="
             color: #ffd700;
             opacity: 1;
+            margin-top: 20px;
             font-size: 0.8rem;
-            margin-top: 30px;
           "
-        >
-          PRESENT THIS PROOF TO THE EVENT COORDINATOR!
+        ><div class="overseer-call">
+    PRESENT THIS PROOF TO THE EVENT CO-ORDINATOR
+</div>
         </p>
 
         <div class="symbol-decor">₿ $ ₿ $ ₿</div>
@@ -81,23 +82,28 @@
     </div>
 
     <script>
+      // These keys correspond to your specific event rounds
       const key1 = "ALPHA";
       const key2 = "OMEGA";
       const key3 = "SHADOW";
 
       function checkKey1() {
         if (document.getElementById("k1").value.toUpperCase() === key1) {
-          document.getElementById("k2").disabled = false;
-          document.getElementById("k2").placeholder = "Enter Key 2";
-          document.getElementById("k2").focus();
+          const k2 = document.getElementById("k2");
+          k2.disabled = false;
+          k2.placeholder = "Enter Key 2";
+          k2.focus();
+          document.getElementById("result").innerText = "KEY 01 ACCEPTED.";
         }
       }
 
       function checkKey2() {
         if (document.getElementById("k2").value.toUpperCase() === key2) {
-          document.getElementById("k3").disabled = false;
-          document.getElementById("k3").placeholder = "Enter Final Key";
-          document.getElementById("k3").focus();
+          const k3 = document.getElementById("k3");
+          k3.disabled = false;
+          k3.placeholder = "Enter Final Key";
+          k3.focus();
+          document.getElementById("result").innerText = "KEY 02 ACCEPTED.";
         }
       }
 
@@ -105,7 +111,7 @@
         const val3 = document.getElementById("k3").value.toUpperCase();
 
         if (val3 === key3) {
-          // Capture the exact moment of victory
+          // Capture high-precision completion time
           const now = new Date();
           const timeString =
             now.getHours().toString().padStart(2, "0") +
@@ -116,17 +122,22 @@
             "." +
             now.getMilliseconds().toString().padStart(3, "0");
 
-          // Update UI
+          const team = localStorage.getItem("bounty_team") || "UNKNOWN";
+
+          // Update UI elements
           document.getElementById("timestamp-display").innerText = timeString;
+          document.getElementById("winner-team-info").innerText =
+            "AGENT TEAM: " + team;
+
           document.getElementById("main-card").classList.add("hidden");
           document.getElementById("winner-screen").classList.remove("hidden");
 
-          // Save state
+          // Finalize session state
           localStorage.setItem("hunt_status", "winner");
           localStorage.setItem("finish_time", timeString);
         } else {
           document.getElementById("result").innerText =
-            "ACCESS DENIED: KEY INVALID";
+            "ACCESS DENIED: FINAL AUTHENTICATION FAILED.";
         }
       }
     </script>
