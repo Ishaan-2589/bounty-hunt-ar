@@ -221,4 +221,8 @@ button:hover {
     font-size: 1.5rem;
     opacity: 0.6;
     letter-spacing: 15px;
+}#riddle-card {
+    border-left: 5px solid #00ff00; /* Hacker accent */
+    padding-left: 20px;
+    background: linear-gradient(to right, rgba(0,40,0,0.9), rgba(0,0,0,0.9));
 }

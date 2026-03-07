@@ -34,73 +34,78 @@
 
     <div id="ar-container"></div>
 
-    <script src="js/riddles.js"></script>
-    <script>
-      let currentStep = parseInt(localStorage.getItem("bounty_step")) || 0;
-      const selectedRoute = localStorage.getItem("bounty_route") || "Route A";
+<script src="js/riddles.js"></script>
+<script>
+    let currentStep = parseInt(localStorage.getItem("bounty_step")) || 0;
+    const selectedRoute = localStorage.getItem("bounty_route") || "Route A";
 
-      // Setup MindAR
-      const startScanner = async () => {
+    const startScanner = async () => {
         const mindarThree = new window.MINDAR.IMAGE.MindARThree({
-          container: document.querySelector("#ar-container"),
-          imageTargetSrc: "./markers/targets.mind",
+            container: document.querySelector("#ar-container"),
+            imageTargetSrc: "./markers/targets.mind", 
         });
-        const { renderer, scene, camera } = mindarThree;
 
-        // Anchor for Target Detection
-        const anchor = mindarThree.addAnchor(0);
+        const {renderer, scene, camera} = mindarThree;
+
+        // Automatically looks for the marker corresponding to the team's progress
+        // Node 1 looks for Marker 0, Node 2 looks for Marker 1, etc.
+        const anchor = mindarThree.addAnchor(currentStep); 
+
         anchor.onTargetFound = () => {
-          showIntercept();
+            if (document.getElementById('riddle-card').classList.contains('hidden')) {
+                showIntercept();
+            }
         };
 
         await mindarThree.start();
-        renderer.setAnimationLoop(() => {
-          renderer.render(scene, camera);
+        renderer.setAnimationLoop(() => { 
+            renderer.render(scene, camera); 
         });
-      };
+    };
 
-      function showIntercept() {
-        document.getElementById("intercept-anim").classList.remove("hidden");
+    function showIntercept() {
+        const intercept = document.getElementById('intercept-anim');
+        intercept.classList.remove('hidden');
+        
         setTimeout(() => {
-          document.getElementById("intercept-anim").classList.add("hidden");
-          showRiddle();
-        }, 3000); // 3-second animation
-      }
+            intercept.classList.add('hidden');
+            showRiddle(); 
+        }, 3000);
+    }
 
-      function showRiddle() {
+    function showRiddle() {
         const nodeKey = routeSteps[selectedRoute][currentStep];
-        document.getElementById("riddle-text").innerText =
-          riddles[nodeKey][selectedRoute];
+        document.getElementById("riddle-text").innerText = riddles[nodeKey][selectedRoute];
         document.getElementById("riddle-card").classList.remove("hidden");
-      }
+    }
 
-      function unlockNextNode() {
-        const input = document
-          .getElementById("node-unlock-code")
-          .value.toUpperCase();
+    function unlockNextNode() {
+        const input = document.getElementById("node-unlock-code").value.toUpperCase();
         const currentNodeKey = routeSteps[selectedRoute][currentStep];
 
         if (input === nodeCodes[currentNodeKey]) {
-          currentStep++;
-          localStorage.setItem("bounty_step", currentStep);
-          if (currentStep >= 6) {
-            window.location.href = "final.html";
-          } else {
-            location.reload(); // Reset for next marker
-          }
+            currentStep++;
+            localStorage.setItem("bounty_step", currentStep);
+            
+            if (currentStep >= 6) {
+                window.location.href = "final.html";
+            } else {
+                location.reload(); 
+            }
         } else {
-          alert("ACCESS DENIED: INVALID CODE");
+            alert("ACCESS DENIED: INVALID AUTHENTICATION CODE");
         }
-      }
+    }
 
-      // Update Progress Bar on Load
-      window.onload = () => {
+    window.onload = () => {
+        // Update Progress UI
         const progress = (currentStep / 6) * 100;
         document.getElementById("progress-bar").style.width = progress + "%";
-        document.getElementById("progress-text").innerText =
-          `NODE ${currentStep + 1}/6`;
+        document.getElementById("progress-text").innerText = `NODE ${currentStep + 1}/6`;
+        
+        // Start the AR engine
         startScanner();
-      };
-    </script>
+    };
+</script>
   </body>
 </html>
