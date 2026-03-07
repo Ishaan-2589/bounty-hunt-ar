@@ -72,6 +72,22 @@
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.4/dist/mindar-image-three.prod.js"></script>
 
     <script>
+      const anchor = mindarThree.addAnchor(0);
+
+      // Add these to see if the scanner is working
+      anchor.onTargetFound = () => {
+        console.log("Target Found!");
+        statusText.innerText = "TARGET ACQUIRED: BOUNTY IDENTIFIED";
+        statusText.style.color = "#00ff00";
+      };
+
+      anchor.onTargetLost = () => {
+        console.log("Target Lost");
+        statusText.innerText = "SCANNING FOR SIGNALS...";
+        statusText.style.color = "#aaa";
+      };
+
+      // ... keep your geometry and mesh code below this
       const startButton = document.querySelector("#startButton");
       const statusText = document.querySelector("#status");
       const uiLayer = document.querySelector("#ui-layer");
