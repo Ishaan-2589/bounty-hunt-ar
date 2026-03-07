@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>ZERO HOUR : Bounty Hunt</title>
+
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body class="center-screen">
+    <div class="start-card">
+      <h1>ZERO HOUR</h1>
+      <p class="subtitle">BOUNTY HUNT</p>
+
+      <label for="route-select">Select Your Route</label>
+
+      <select id="route-select">
+        <option value="A">Route A</option>
+        <option value="B">Route B</option>
+        <option value="C">Route C</option>
+        <option value="D">Route D</option>
+        <option value="E">Route E</option>
+      </select>
+
+      <button id="start-btn">START HUNT</button>
+    </div>
+
+    <script>
+      document
+        .getElementById("start-btn")
+        .addEventListener("click", function () {
+          const route = document.getElementById("route-select").value;
+
+          localStorage.setItem("route", route);
+          localStorage.setItem("currentNode", 0);
+
+          window.location.href = "hunt.html";
+        });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>ZERO HOUR Scanner</title>
+
+    <link rel="stylesheet" href="css/style.css" />
+
+    <!-- THREE JS -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
+
+    <!-- MINDAR -->
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"></script>
+  </head>
+
+  <body>
+    <div id="ar-container"></div>
+
+    <!-- SIGNAL OVERLAY -->
+
+    <div id="signal-overlay" class="signal-overlay hidden">
+      <div class="signal-box">
+        <div class="signal-title">⚠ SIGNAL INTERCEPTED</div>
+
+        <div class="signal-loading">
+          Decrypting transmission<span class="dots"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIDDLE PANEL -->
+
+    <div id="riddle-panel" class="riddle-panel hidden">
+      <div class="riddle-card">
+        <div class="riddle-header">
+          <span class="riddle-tag">ENCRYPTED CLUE</span>
+        </div>
+
+        <div id="riddle-text" class="riddle-text">
+          Cars sleep here before the hunt begins.
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function showSignalThenRiddle() {
+        const overlay = document.getElementById("signal-overlay");
+        const panel = document.getElementById("riddle-panel");
+        const card = document.querySelector(".riddle-card");
+
+        overlay.classList.remove("hidden");
+
+        if (navigator.vibrate) {
+          navigator.vibrate(120);
+        }
+
+        setTimeout(() => {
+          overlay.classList.add("hidden");
+
+          panel.classList.remove("hidden");
+
+          setTimeout(() => {
+            card.classList.add("show");
+          }, 50);
+        }, 1000);
+      }
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        const mindarThree = new window.MINDAR.IMAGE.MindARThree({
+          container: document.querySelector("#ar-container"),
+          imageTargetSrc: "markers/targets.mind",
+        });
+
+        const { renderer, scene, camera } = mindarThree;
+
+        const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+        scene.add(light);
+
+        const anchor = mindarThree.addAnchor(0);
+
+        let detected = false;
+
+        anchor.onTargetFound = () => {
+          if (detected) return;
+
+          detected = true;
+
+          showSignalThenRiddle();
+        };
+
+        await mindarThree.start();
+
+        renderer.setAnimationLoop(() => {
+          renderer.render(scene, camera);
+        });
+      });
+    </script>
+  </body>
+</html>
