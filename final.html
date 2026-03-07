@@ -3,36 +3,81 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ZERO HOUR : Final Shutdown</title>
+    <title>ZERO HOUR : Mission Complete</title>
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body class="center-screen">
     <div class="scanline"></div>
 
-    <div class="final-card">
+    <div class="final-card" id="main-card">
       <div class="header-box">
         <h1>TERMINAL ACCESS</h1>
         <p class="subtitle">NEMESIS CORE SHUTDOWN</p>
       </div>
 
       <div class="key-input">
-        <label>ENCRYPTION KEY 01 (ROUND 1)</label>
+        <label>ENCRYPTION KEY 01</label>
         <input id="k1" placeholder="Enter Key 1" oninput="checkKey1()" />
       </div>
 
       <div class="key-input">
-        <label>ENCRYPTION KEY 02 (ROUND 2)</label>
+        <label>ENCRYPTION KEY 02</label>
         <input id="k2" placeholder="LOCKED" disabled oninput="checkKey2()" />
       </div>
 
       <div class="key-input">
-        <label>FINAL SHUTDOWN KEY (NODE F)</label>
+        <label>FINAL SHUTDOWN KEY</label>
         <input id="k3" placeholder="LOCKED" disabled />
       </div>
 
       <button id="final-btn" onclick="verifyFinal()">EXECUTE SHUTDOWN</button>
-
       <p id="result" class="warning-text">AWAITING AUTHORIZATION...</p>
+    </div>
+
+    <div id="winner-screen" class="hidden">
+      <div class="final-card winner-card">
+        <div class="symbol-decor">₿ $ ₿ $ ₿</div>
+
+        <span class="bounty-badge">◈</span>
+
+        <h1 class="gold-text">BOUNTY CLAIMED</h1>
+        <p class="subtitle" style="color: #ffd700">NEMESIS CORE: LIQUIDATED</p>
+
+        <div class="token-container">
+          <p style="margin: 0 0 10px 0; font-size: 0.7rem; letter-spacing: 2px">
+            OFFICIAL COMPLETION TIMESTAMP
+          </p>
+          <h2
+            id="timestamp-display"
+            class="gold-text"
+            style="font-size: 1.8rem; margin: 0"
+          ></h2>
+        </div>
+
+        <div
+          style="
+            margin-top: 20px;
+            border-top: 1px solid rgba(255, 215, 0, 0.3);
+            padding-top: 15px;
+          "
+        >
+          <p id="winner-team-info" style="font-size: 1rem"></p>
+        </div>
+
+        <p
+          class="warning-text"
+          style="
+            color: #ffd700;
+            opacity: 1;
+            font-size: 0.8rem;
+            margin-top: 30px;
+          "
+        >
+          PRESENT THIS PROOF TO THE EVENT COORDINATOR!
+        </p>
+
+        <div class="symbol-decor">₿ $ ₿ $ ₿</div>
+      </div>
     </div>
 
     <script>
@@ -40,45 +85,48 @@
       const key2 = "OMEGA";
       const key3 = "SHADOW";
 
-      // Auto-unlock Key 2
       function checkKey1() {
-        const val = document.getElementById("k1").value.toUpperCase();
-        if (val === key1) {
-          const k2 = document.getElementById("k2");
-          k2.disabled = false;
-          k2.placeholder = "Enter Key 2";
-          k2.focus();
-          document.getElementById("result").innerText =
-            "KEY 01 ACCEPTED. UNLOCKING 02...";
+        if (document.getElementById("k1").value.toUpperCase() === key1) {
+          document.getElementById("k2").disabled = false;
+          document.getElementById("k2").placeholder = "Enter Key 2";
+          document.getElementById("k2").focus();
         }
       }
 
-      // Auto-unlock Key 3
       function checkKey2() {
-        const val = document.getElementById("k2").value.toUpperCase();
-        if (val === key2) {
-          const k3 = document.getElementById("k3");
-          k3.disabled = false;
-          k3.placeholder = "Enter Final Key";
-          k3.focus();
-          document.getElementById("result").innerText =
-            "KEY 02 ACCEPTED. UNLOCKING FINAL...";
+        if (document.getElementById("k2").value.toUpperCase() === key2) {
+          document.getElementById("k3").disabled = false;
+          document.getElementById("k3").placeholder = "Enter Final Key";
+          document.getElementById("k3").focus();
         }
       }
 
-      // Final Verification
       function verifyFinal() {
         const val3 = document.getElementById("k3").value.toUpperCase();
-        const result = document.getElementById("result");
 
         if (val3 === key3) {
-          result.innerHTML =
-            "<span class='success-msg'>ROGUE AI SHUTDOWN COMPLETE. BOUNTY CLAIMED.</span>";
-          document.getElementById("final-btn").style.display = "none";
-          // Optional: Clear local storage to reset game
-          localStorage.clear();
+          // Capture the exact moment of victory
+          const now = new Date();
+          const timeString =
+            now.getHours().toString().padStart(2, "0") +
+            ":" +
+            now.getMinutes().toString().padStart(2, "0") +
+            ":" +
+            now.getSeconds().toString().padStart(2, "0") +
+            "." +
+            now.getMilliseconds().toString().padStart(3, "0");
+
+          // Update UI
+          document.getElementById("timestamp-display").innerText = timeString;
+          document.getElementById("main-card").classList.add("hidden");
+          document.getElementById("winner-screen").classList.remove("hidden");
+
+          // Save state
+          localStorage.setItem("hunt_status", "winner");
+          localStorage.setItem("finish_time", timeString);
         } else {
-          result.innerText = "ACCESS DENIED: FINAL AUTHENTICATION FAILED.";
+          document.getElementById("result").innerText =
+            "ACCESS DENIED: KEY INVALID";
         }
       }
     </script>

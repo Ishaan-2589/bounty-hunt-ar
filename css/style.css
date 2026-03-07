@@ -182,3 +182,43 @@ button:hover {
     margin-top: 20px;
     opacity: 0.8;
 }
+
+/* --- GOLDEN WINNER THEME --- */
+.winner-card {
+    background: linear-gradient(145deg, #1a1a00, #000000);
+    border: 3px solid #ffd700 !important; /* Gold */
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.6) !important;
+    color: #ffd700 !important;
+}
+
+.gold-text {
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+    font-weight: bold;
+}
+
+.bounty-badge {
+    font-size: 4rem;
+    margin: 10px 0;
+    display: block;
+    animation: pulse-gold 2s infinite;
+}
+
+@keyframes pulse-gold {
+    0% { transform: scale(1); filter: drop-shadow(0 0 5px #ffd700); }
+    50% { transform: scale(1.1); filter: drop-shadow(0 0 20px #ffd700); }
+    100% { transform: scale(1); filter: drop-shadow(0 0 5px #ffd700); }
+}
+
+.token-container {
+    background: rgba(255, 215, 0, 0.1);
+    border: 1px dashed #ffd700;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.symbol-decor {
+    font-size: 1.5rem;
+    opacity: 0.6;
+    letter-spacing: 15px;
+}
