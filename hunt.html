@@ -177,7 +177,8 @@
           localStorage.setItem("bounty_step", currentStep);
 
           if (currentStep >= 6) {
-            window.location.href = "final.html";
+            // TRIGGER SYSTEM HIJACK ANIMATION
+            showHijackSequence();
           } else {
             location.reload();
           }
@@ -188,14 +189,37 @@
       }
 
       window.onload = () => {
-        // Update UI Progress
-        const progress = (currentStep / 6) * 100;
+        // Percentage calculation: (currentStep / totalSteps) * 100
+        const totalNodes = 6;
+        const progress = (currentStep / totalNodes) * 100;
+
         document.getElementById("progress-bar").style.width = progress + "%";
+
+        // Ensure text never exceeds NODE 6/6
+        const displayStep = Math.min(currentStep + 1, totalNodes);
         document.getElementById("progress-text").innerText =
-          `NODE ${currentStep + 1}/6`;
+          `NODE ${displayStep}/${totalNodes}`;
 
         startScanner();
       };
+      function showHijackSequence() {
+        // Replace the UI with a full-screen "Neutralized" message
+        const container = document.getElementById("overlay-container");
+        container.style.pointerEvents = "auto";
+        container.innerHTML = `
+        <div class="hijack-screen">
+            <div class="glitch-text" style="font-size: 2rem;">SECTOR NEUTRALIZED</div>
+            <p style="color: #00e5ff; margin: 20px 0;">TRANSFERRING CONTROL TO MAIN TERMINAL...</p>
+            <div class="loading-bar-container">
+                <div class="loading-bar-fill"></div>
+            </div>
+        </div>
+    `;
+
+        setTimeout(() => {
+          window.location.href = "final.html";
+        }, 3500);
+      }
     </script>
   </body>
 </html>

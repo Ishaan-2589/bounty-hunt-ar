@@ -294,3 +294,37 @@ button:hover {
     50% { opacity: 0.5; box-shadow: 0 0 15px #ffd700; }
     100% { opacity: 1; box-shadow: 0 0 5px #ffd700; }
 }
+
+.hijack-screen {
+    background: #000;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    z-index: 20000;
+}
+
+.loading-bar-container {
+    width: 250px;
+    height: 4px;
+    background: rgba(0, 229, 255, 0.2);
+    margin-top: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+.loading-bar-fill {
+    width: 0%;
+    height: 100%;
+    background: #00e5ff;
+    animation: fill-and-glitch 3s forwards;
+}
+
+@keyframes fill-and-glitch {
+    0% { width: 0%; }
+    50% { width: 70%; filter: hue-rotate(90deg); }
+    100% { width: 100%; }
+}
