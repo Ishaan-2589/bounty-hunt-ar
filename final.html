@@ -5,6 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ZERO HOUR : Mission Complete</title>
     <link rel="stylesheet" href="css/style.css" />
+    <style>
+      .final-card {
+        background: rgba(0, 15, 20, 0.98) !important;
+        border: 2px solid #00e5ff !important;
+        box-shadow: 0 0 30px rgba(0, 229, 255, 0.3) !important;
+      }
+
+      h1 {
+        color: #00e5ff !important;
+        text-shadow: 0 0 15px #00e5ff !important;
+      }
+
+      label {
+        color: #00bcd4 !important;
+      }
+
+      .warning-text {
+        color: #00e5ff !important;
+        opacity: 1 !important;
+      }
+
+      /* Keep the Winner Screen Gold for contrast */
+      .winner-card {
+        border: 3px solid #ffd700 !important;
+        color: #ffd700 !important;
+        box-shadow: 0 0 40px rgba(255, 215, 0, 0.5) !important;
+      }
+    </style>
   </head>
   <body class="center-screen">
     <div class="scanline"></div>
@@ -36,16 +64,25 @@
 
     <div id="winner-screen" class="hidden">
       <div class="final-card winner-card">
-        <div class="symbol-decor">₿ $ ₿ $ ₿</div>
+        <div class="symbol-decor">◈ ◈ ◈ ◈ ◈</div>
 
-        <span class="bounty-badge">◈</span>
+        <span class="bounty-badge">🏆</span>
 
-        <h1 class="gold-text">BOUNTY CLAIMED</h1>
-        <p class="subtitle" style="color: #ffd700">ROGUE AI: LIQUIDATED</p>
+        <h1 class="gold-text">MISSION ACCOMPLISHED</h1>
+        <p class="subtitle" style="color: #ffd700">
+          AGENT STATUS: ELITE | RESPECT ++
+        </p>
 
         <div class="token-container">
-          <p style="margin: 0 0 10px 0; font-size: 0.7rem; letter-spacing: 2px">
-            OFFICIAL COMPLETION TIMESTAMP
+          <p
+            style="
+              margin: 0 0 10px 0;
+              font-size: 0.7rem;
+              letter-spacing: 2px;
+              color: #ffd700;
+            "
+          >
+            EXTRACTION TIMESTAMP
           </p>
           <h2
             id="timestamp-display"
@@ -61,23 +98,14 @@
             padding-top: 15px;
           "
         >
-          <p id="winner-team-info" style="font-size: 1rem"></p>
+          <p id="winner-team-info" style="font-size: 1rem; color: #ffd700"></p>
         </div>
 
-        <p
-          class="warning-text"
-          style="
-            color: #ffd700;
-            opacity: 1;
-            margin-top: 20px;
-            font-size: 0.8rem;
-          "
-        ><div class="overseer-call">
-    PRESENT THIS PROOF TO THE EVENT CO-ORDINATOR
-</div>
-        </p>
+        <div class="overseer-call">
+          VERIFIED SUCCESS. <br/> SHOW THIS SCREEN TO THE NEAREST EVENT COORDINATOR.
+        </div>
 
-        <div class="symbol-decor">₿ $ ₿ $ ₿</div>
+        <div class="symbol-decor">◈ ◈ ◈ ◈ ◈</div>
       </div>
     </div>
 

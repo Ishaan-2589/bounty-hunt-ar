@@ -5,6 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ZERO HOUR - Scanner</title>
     <link rel="stylesheet" href="css/style.css" />
+    <style>
+      :root {
+        --glow-cyan: #00e5ff;
+        --dark-bg: rgba(0, 15, 20, 0.95);
+        --text-main: #e0f7fa;
+      }
+
+      #progress-container {
+        border: 1px solid var(--glow-cyan) !important;
+        box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+      }
+
+      #progress-bar {
+        background: var(--glow-cyan) !important;
+      }
+
+      #riddle-card {
+        border-left: 5px solid var(--glow-cyan) !important;
+        background: linear-gradient(
+          to right,
+          rgba(0, 40, 50, 0.95),
+          rgba(0, 0, 0, 0.95)
+        ) !important;
+        color: var(--text-main) !important;
+        box-shadow: 0 0 20px rgba(0, 229, 255, 0.3) !important;
+      }
+
+      #riddle-title {
+        color: var(--glow-cyan);
+        text-shadow: 0 0 10px var(--glow-cyan);
+      }
+
+      button {
+        background: var(--glow-cyan) !important;
+        color: #000 !important;
+        box-shadow: 0 4px 15px rgba(0, 229, 255, 0.4);
+      }
+
+      input {
+        border: 1px solid var(--glow-cyan) !important;
+        color: var(--glow-cyan) !important;
+      }
+    </style>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r123/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.4/dist/mindar-image-three.prod.js"></script>
   </head>
