@@ -55,9 +55,26 @@
 
         const { renderer, scene, camera } = mindarThree;
 
-        // In production, each node has its own marker
-        // Marker 0 = Node A, Marker 1 = Node B, etc.
-        const anchor = mindarThree.addAnchor(currentStep);
+        // The mapping of your 10 physical locations to their marker index
+        const markerIndexMap = {
+          A: 0,
+          B: 1,
+          C: 2,
+          D: 3,
+          E: 4,
+          G: 5,
+          H: 6,
+          I: 7,
+          J: 8,
+          F: 9,
+        };
+
+        // Calculate which specific marker this team needs right now
+        const nodeKey = routeSteps[selectedRoute][currentStep];
+        const targetIndex = markerIndexMap[nodeKey];
+
+        // Tell the camera to ONLY search for that specific marker
+        const anchor = mindarThree.addAnchor(targetIndex);
 
         anchor.onTargetFound = () => {
           if (

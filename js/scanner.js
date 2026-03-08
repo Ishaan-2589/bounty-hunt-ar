@@ -1,42 +1,47 @@
 document.addEventListener("DOMContentLoaded", async () => {
+    // 1. Initialize MindAR with the container
+    const mindarThree = new window.MINDAR.IMAGE.MindARThree({
+        container: document.querySelector("#ar-container"),
+        imageTargetSrc: "markers/targets.mind",
+    });
 
-const mindarThree = new window.MINDAR.IMAGE.MindARThree({
+    const {renderer, scene, camera} = mindarThree;
 
-container: document.querySelector("#ar-container"),
-imageTargetSrc: "markers/targets.mind"
+    // 2. Setup the Marker Index Mapping for 10 markers
+    const markerIndexMap = {
+        "A":0, "B":1, "C":2, "D":3, "E":4, "G":5, "H":6, "I":7, "J":8, "F":9
+    };
 
-});
+    // 3. Get the specific anchor for the user's current node
+    const route = getRoute();
+    const nodeIndex = getCurrentNode();
+    const nodeKey = ROUTES[route][nodeIndex];
+    const targetIndex = markerIndexMap[nodeKey];
 
-const {renderer, scene, camera} = mindarThree;
+    // Create the anchor for the specific marker the team is looking for
+    const anchor = mindarThree.addAnchor(targetIndex);
 
-const anchor = mindarThree.addAnchor(0);
+    let clueShown = false;
 
-let clueShown=false;
+    anchor.onTargetFound = () => {
+        if (clueShown) return;
+        clueShown = true;
 
-anchor.onTargetFound = () => {
+        const riddle = riddles[nodeKey][route];
+        
+        // Show the UI box
+        showSignalThenRiddle(riddle);
 
-if(clueShown) return;
+        // FORCED FOCUS FIX: Ensure the keyboard can trigger
+        const inputField = document.getElementById("node-unlock-code");
+        if(inputField) {
+            inputField.style.pointerEvents = "auto"; 
+            // We don't focus() here yet because the animation might still be playing
+        }
+    };
 
-clueShown=true;
-
-const route = getRoute();
-
-const nodeIndex = getCurrentNode();
-
-const node = ROUTES[route][nodeIndex];
-
-const riddle = riddles[node][route];
-
-showSignalThenRiddle(riddle);
-
-};
-
-await mindarThree.start();
-
-renderer.setAnimationLoop(()=>{
-
-renderer.render(scene,camera);
-
-});
-
+    await mindarThree.start();
+    renderer.setAnimationLoop(() => {
+        renderer.render(scene, camera);
+    });
 });
