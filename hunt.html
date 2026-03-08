@@ -34,7 +34,12 @@
             type="text"
             id="node-unlock-code"
             placeholder="ENTER DECRYPTION KEY"
+            onclick="this.focus()"
+            ontouchstart="this.focus();"
           />
+          <p style="font-size: 0.5rem; color: #88ff88; margin-top: 5px">
+            TAP BOX ABOVE TO ACTIVATE KEYBOARD
+          </p>
         </div>
         <button onclick="unlockNextNode()">SUBMIT AUTH</button>
       </div>
@@ -104,8 +109,15 @@
         const nodeKey = routeSteps[selectedRoute][currentStep];
         const riddleContent = riddles[nodeKey][selectedRoute];
 
+        const inputField = document.getElementById("node-unlock-code");
         document.getElementById("riddle-text").innerText = riddleContent;
         document.getElementById("riddle-card").classList.remove("hidden");
+
+        // Force Open Keyboard attempt after 500ms to let the UI settle
+        setTimeout(() => {
+          inputField.focus();
+          inputField.click(); // Some browsers require a click event to trigger the keyboard
+        }, 500);
       }
 
       function unlockNextNode() {
