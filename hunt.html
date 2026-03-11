@@ -145,33 +145,118 @@
 
           // MAGIC FIX: The "Off-By-One" Scavenger Hunt Shift
           anchor.onTargetFound = () => {
-            let displayRiddle = "";
+            const card = document.getElementById("riddle-card");
 
-            if (currentStep < 5) {
-              // Fetch the puzzle for the NEXT location
-              const nextNodeKey = routeSteps[selectedRoute][currentStep + 1];
-              const textKey = "Route " + selectedRoute;
+            // Step 1 — Show scanning animation
+            card.innerHTML = `
+    <h3 style="color:#00e5ff;font-family:monospace;">
+      TARGET DETECTED
+    </h3>
 
-              if (riddles[nextNodeKey] && riddles[nextNodeKey][textKey]) {
-                displayRiddle = riddles[nextNodeKey][textKey];
-              } else if (
-                riddles[nextNodeKey] &&
-                riddles[nextNodeKey]["ALL_ROUTES"]
-              ) {
-                // Catches the Print Shop ALL_ROUTES binary
-                displayRiddle = riddles[nextNodeKey]["ALL_ROUTES"];
-              } else {
-                displayRiddle =
-                  "SYSTEM LOG: Proceed to " + riddleAnswers[nextNodeKey];
+    <p style="margin-top:10px;font-family:monospace;">
+      SCANNING NODE...
+    </p>
+
+    <div class="loading-bar-container">
+      <div class="loading-bar-fill"></div>
+    </div>
+
+    <p style="margin-top:10px;font-family:monospace;">
+      DECRYPTING DATA STREAM
+    </p>
+  `;
+
+            card.style.display = "block";
+
+            // Wait for animation
+            setTimeout(() => {
+              let displayRiddle = "";
+
+              // NORMAL NODES
+              if (currentStep < 5) {
+                const nextNodeKey = routeSteps[selectedRoute][currentStep + 1];
+                const textKey = "Route " + selectedRoute;
+
+                if (riddles[nextNodeKey] && riddles[nextNodeKey][textKey]) {
+                  displayRiddle = riddles[nextNodeKey][textKey];
+                } else if (
+                  riddles[nextNodeKey] &&
+                  riddles[nextNodeKey]["ALL_ROUTES"]
+                ) {
+                  displayRiddle = riddles[nextNodeKey]["ALL_ROUTES"];
+                } else {
+                  displayRiddle =
+                    "SYSTEM LOG: Proceed to " + riddleAnswers[nextNodeKey];
+                }
+
+                card.innerHTML = `
+        <p id="riddle-text">${displayRiddle}</p>
+
+        <input
+          type="text"
+          id="node-unlock-code"
+          placeholder="ENTER ACCESS KEY"
+          style="width:90%;padding:12px;margin-top:15px;background:#000;border:1px solid #00ff00;color:#00ff00;text-align:center;"
+        />
+
+        <button id="submit-btn"
+          style="width:90%;padding:12px;margin-top:10px;background:#00ff00;color:#000;font-weight:bold;">
+          SUBMIT DATA
+        </button>
+      `;
+
+                document.getElementById("submit-btn").onclick = () => {
+                  const userInput = document
+                    .getElementById("node-unlock-code")
+                    .value.trim()
+                    .toUpperCase();
+
+                  const correctAnswer = riddleAnswers[nextNodeKey];
+
+                  if (userInput === correctAnswer) {
+                    currentStep++;
+                    localStorage.setItem("bounty_step", currentStep);
+                    location.reload();
+                  } else {
+                    alert("ACCESS DENIED: KEY INCORRECT");
+                  }
+                };
               }
-            } else {
-              // If they are at Step 5 (The final Print Shop marker)
-              displayRiddle =
-                "FINAL CORE REACHED. SECTOR BREACHED. \n\nENTER OVERRIDE KEY TO NEUTRALIZE.";
-            }
 
-            document.getElementById("riddle-text").innerText = displayRiddle;
-            document.getElementById("riddle-card").style.display = "block";
+              // FINAL NODE (PRINT SHOP)
+              else {
+                card.innerHTML = `
+        <h2 style="color:#00ff00;font-family:monospace;">
+          CORE SECURITY COLLAPSED
+        </h2>
+
+        <p style="margin-top:10px;">
+          PRINT NODE COMPROMISED
+        </p>
+
+        <p style="margin-top:15px;">
+          CONGRATULATIONS AGENT
+        </p>
+
+        <h1 style="color:#ffd700;margin-top:20px;">
+          KEY 03 ACQUIRED
+        </h1>
+
+        <h2 style="color:#00e5ff;margin-top:10px;">
+          DOMINANCE
+        </h2>
+
+        <p style="margin-top:20px;font-size:0.9rem;">
+          PROCEEDING TO FINAL SHUTDOWN...
+        </p>
+      `;
+
+                setTimeout(() => {
+                  localStorage.setItem("bounty_step", 6);
+                  window.location.href = "final.html";
+                }, 3500);
+              }
+            }, 1200);
           };
 
           await mindarThree.start();
@@ -226,6 +311,32 @@
           alert("ACCESS DENIED: KEY INCORRECT");
         }
       });
+      function showRiddle() {
+        let displayRiddle = "";
+
+        if (currentStep < 5) {
+          const nextNodeKey = routeSteps[selectedRoute][currentStep + 1];
+          const textKey = "Route " + selectedRoute;
+
+          if (riddles[nextNodeKey] && riddles[nextNodeKey][textKey]) {
+            displayRiddle = riddles[nextNodeKey][textKey];
+          } else if (
+            riddles[nextNodeKey] &&
+            riddles[nextNodeKey]["ALL_ROUTES"]
+          ) {
+            displayRiddle = riddles[nextNodeKey]["ALL_ROUTES"];
+          } else {
+            displayRiddle =
+              "SYSTEM LOG: Proceed to " + riddleAnswers[nextNodeKey];
+          }
+
+          document.getElementById("riddle-card").innerHTML = `
+      <p id="riddle-text">${displayRiddle}</p>
+      <input id="node-unlock-code" placeholder="ENTER ACCESS KEY"/>
+      <button id="submit-btn">SUBMIT DATA</button>
+    `;
+        }
+      }
     </script>
   </body>
 </html>
