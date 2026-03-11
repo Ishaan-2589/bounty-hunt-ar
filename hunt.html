@@ -1,167 +1,133 @@
 <!doctype html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ZERO HOUR - Scanner</title>
-    <link rel="stylesheet" href="css/style.css" />
-    <style>
-      :root {
-        --glow-cyan: #00e5ff;
-        --dark-bg: rgba(0, 15, 20, 0.95);
-        --text-main: #e0f7fa;
-      }
-
-      #progress-container {
-        border: 1px solid var(--glow-cyan) !important;
-        box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
-      }
-
-      #progress-bar {
-        background: var(--glow-cyan) !important;
-      }
-
-      #riddle-card {
-        border-left: 5px solid var(--glow-cyan) !important;
-        background: linear-gradient(
-          to right,
-          rgba(0, 40, 50, 0.95),
-          rgba(0, 0, 0, 0.95)
-        ) !important;
-        color: var(--text-main) !important;
-        box-shadow: 0 0 20px rgba(0, 229, 255, 0.3) !important;
-      }
-
-      #riddle-title {
-        color: var(--glow-cyan);
-        text-shadow: 0 0 10px var(--glow-cyan);
-      }
-
-      button {
-        background: var(--glow-cyan) !important;
-        color: #000 !important;
-        box-shadow: 0 4px 15px rgba(0, 229, 255, 0.4);
-      }
-
-      input {
-        border: 1px solid var(--glow-cyan) !important;
-        color: var(--glow-cyan) !important;
-      }
-    </style>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r123/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.4/dist/mindar-image-three.prod.js"></script>
+    <title>RECONNAISSANCE UNIT</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-three.prod.js"></script>
+    <script src="riddles.js"></script>
   </head>
   <body>
-    <div class="scanline"></div>
-
-    <div id="progress-container">
-      <div id="progress-bar"></div>
-      <div id="progress-text">NODE 1/6</div>
+    <div
+      id="ui-overlay"
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 10000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      "
+    >
+      <h2 style="color: #00e5ff; margin-bottom: 20px">SYSTEM READY</h2>
+      <button
+        id="start-mission-btn"
+        onclick="startMission()"
+        style="
+          padding: 15px 30px;
+          background: #00e5ff;
+          color: #000;
+          border: none;
+          font-weight: bold;
+          cursor: pointer;
+          font-family: &quot;Courier New&quot;, Courier, monospace;
+        "
+      >
+        START SCANNER
+      </button>
+      <p style="color: #666; margin-top: 15px; font-size: 0.8rem">
+        Click to grant camera permissions
+      </p>
     </div>
 
-    <div id="overlay-container">
-      <div id="intercept-anim" class="hidden">
-        <div class="scanning-line"></div>
-        <div class="glitch-text">⚠ SIGNAL INTERCEPTED</div>
-        <p>DECRYPTING ROGUE AI DATA...</p>
+    <div id="scanner-container">
+      <div id="progress-container">
+        <div id="progress-bar"></div>
+        <div id="progress-text">NODE 1/6</div>
       </div>
 
-      <div id="riddle-card" class="hidden">
-        <div class="header-box">
-          <h2 id="riddle-title">DATA DECRYPTED</h2>
-        </div>
-        <p id="riddle-text">SCANNING FOR TRANSMISSION...</p>
-
-        <div class="input-group">
-          <input
-            type="text"
-            id="node-unlock-code"
-            placeholder="ENTER DECRYPTION KEY"
-            onclick="this.focus()"
-            ontouchstart="this.focus();"
-          />
-          <p style="font-size: 0.5rem; color: #88ff88; margin-top: 5px">
-            TAP BOX ABOVE TO ACTIVATE KEYBOARD
-          </p>
-        </div>
-        <button onclick="unlockNextNode()">SUBMIT AUTH</button>
+      <div id="riddle-card">
+        <p id="riddle-text">INITIALIZING...</p>
+        <input
+          type="text"
+          id="node-unlock-code"
+          placeholder="ENTER ACCESS KEY"
+        />
+        <button onclick="unlockNextNode()">SUBMIT DATA</button>
       </div>
     </div>
 
-    <div id="ar-container"></div>
+    <div
+      id="overlay-container"
+      style="
+        pointer-events: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 20000;
+      "
+    ></div>
 
-    <script src="js/riddles.js"></script>
     <script>
+      const selectedRoute = localStorage.getItem("bounty_route") || "A";
       let currentStep = parseInt(localStorage.getItem("bounty_step")) || 0;
-      const selectedRoute = localStorage.getItem("bounty_route") || "Route A";
 
-      const startScanner = async () => {
-        const mindarThree = new window.MINDAR.IMAGE.MindARThree({
-          container: document.querySelector("#ar-container"),
-          imageTargetSrc: "./markers/targets.mind",
-        });
-
-        const { renderer, scene, camera } = mindarThree;
-
-        // The mapping of your 10 physical locations to their marker index
-        const markerIndexMap = {
-          A: 0,
-          B: 1,
-          C: 2,
-          D: 3,
-          E: 4,
-          G: 5,
-          H: 6,
-          I: 7,
-          J: 8,
-          F: 9,
-        };
-
-        // Calculate which specific marker this team needs right now
-        const nodeKey = routeSteps[selectedRoute][currentStep];
-        const targetIndex = markerIndexMap[nodeKey];
-
-        // Tell the camera to ONLY search for that specific marker
-        const anchor = mindarThree.addAnchor(0);
-
-        anchor.onTargetFound = () => {
-          if (
-            document.getElementById("riddle-card").classList.contains("hidden")
-          ) {
-            showIntercept();
-          }
-        };
-
-        await mindarThree.start();
-        renderer.setAnimationLoop(() => {
-          renderer.render(scene, camera);
-        });
+      // Staggered Anti-Clash Routes from your pattern
+      const routeSteps = {
+        A: ["A", "H", "C", "D", "E", "F"],
+        B: ["G", "I", "D", "C", "B", "F"],
+        C: ["B", "C", "H", "A", "D", "F"],
+        D: ["I", "G", "A", "E", "C", "F"],
+        E: ["D", "E", "J", "C", "H", "F"],
       };
 
-      function showIntercept() {
-        const intercept = document.getElementById("intercept-anim");
-        intercept.classList.remove("hidden");
+      const mindarThree = new window.MINDAR.IMAGE.MindARThree({
+        container: document.body,
+        imageTargetSrc: "markers/targets.mind", // Ensure this path is correct
+        uiLoading: "no",
+        uiScanning: "yes",
+      });
 
-        setTimeout(() => {
-          intercept.classList.add("hidden");
-          showRiddle();
-        }, 3000);
+      async function startMission() {
+        const btn = document.getElementById("start-mission-btn");
+        btn.innerText = "UPLINKING...";
+        btn.disabled = true;
+
+        try {
+          await mindarThree.start(); // User gesture trigger
+          document.getElementById("ui-overlay").style.display = "none";
+          updateUI();
+        } catch (err) {
+          alert(
+            "CAMERA ERROR: Please ensure you are on HTTPS and have granted permissions.",
+          );
+          btn.innerText = "RETRY";
+          btn.disabled = false;
+        }
       }
 
-      function showRiddle() {
-        const nodeKey = routeSteps[selectedRoute][currentStep];
-        const riddleContent = riddles[nodeKey][selectedRoute];
+      function updateUI() {
+        const totalNodes = 6;
+        const progress = (currentStep / totalNodes) * 100;
+        document.getElementById("progress-bar").style.width = progress + "%";
 
-        const inputField = document.getElementById("node-unlock-code");
-        document.getElementById("riddle-text").innerText = riddleContent;
-        document.getElementById("riddle-card").classList.remove("hidden");
+        // Fixes the 7/6 display issue
+        const displayStep = Math.min(currentStep + 1, totalNodes);
+        document.getElementById("progress-text").innerText =
+          `NODE ${displayStep}/${totalNodes}`;
 
-        // Force Open Keyboard attempt after 500ms to let the UI settle
-        setTimeout(() => {
-          inputField.focus();
-          inputField.click(); // Some browsers require a click event to trigger the keyboard
-        }, 500);
+        // Load Riddle from riddles.js
+        const currentNodeKey = routeSteps[selectedRoute][currentStep];
+        document.getElementById("riddle-text").innerText =
+          riddles[currentNodeKey][`Route ${selectedRoute}`];
       }
 
       function unlockNextNode() {
@@ -177,48 +143,31 @@
           localStorage.setItem("bounty_step", currentStep);
 
           if (currentStep >= 6) {
-            // TRIGGER SYSTEM HIJACK ANIMATION
-            showHijackSequence();
+            showHijackSequence(); // Trigger the reward transition
           } else {
             location.reload();
           }
         } else {
           alert("ACCESS DENIED: KEY INCORRECT");
-          document.getElementById("node-unlock-code").value = "";
         }
       }
 
-      window.onload = () => {
-        // Percentage calculation: (currentStep / totalSteps) * 100
-        const totalNodes = 6;
-        const progress = (currentStep / totalNodes) * 100;
-
-        document.getElementById("progress-bar").style.width = progress + "%";
-
-        // Ensure text never exceeds NODE 6/6
-        const displayStep = Math.min(currentStep + 1, totalNodes);
-        document.getElementById("progress-text").innerText =
-          `NODE ${displayStep}/${totalNodes}`;
-
-        startScanner();
-      };
       function showHijackSequence() {
-        // Replace the UI with a full-screen "Neutralized" message
         const container = document.getElementById("overlay-container");
         container.style.pointerEvents = "auto";
         container.innerHTML = `
-        <div class="hijack-screen">
-            <div class="glitch-text" style="font-size: 2rem;">SECTOR NEUTRALIZED</div>
-            <p style="color: #00e5ff; margin: 20px 0;">TRANSFERRING CONTROL TO MAIN TERMINAL...</p>
-            <div class="loading-bar-container">
-                <div class="loading-bar-fill"></div>
-            </div>
-        </div>
-    `;
-
+                <div class="hijack-screen" style="background:#000; width:100vw; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+                    <div class="glitch-text" style="font-size: 2.2rem; color: #ffd700;">SECTOR NEUTRALIZED</div>
+                    <div style="margin: 30px 0; border: 1px solid #00e5ff; padding: 20px; background: rgba(0,229,255,0.1);">
+                        <p style="color: #fff; letter-spacing: 2px; font-size: 0.8rem;">FINAL ACCESS KEY ACQUIRED:</p>
+                        <h1 style="color: #00e5ff; font-size: 2.5rem; margin: 10px 0;">DOMINANCE</h1>
+                    </div>
+                    <div class="loading-bar-container" style="width:200px; height:4px; background:#333;"><div class="loading-bar-fill" style="height:100%; background:#00e5ff; width:100%; transition: width 3s linear;"></div></div>
+                </div>
+            `;
         setTimeout(() => {
           window.location.href = "final.html";
-        }, 3500);
+        }, 5000);
       }
     </script>
   </body>
