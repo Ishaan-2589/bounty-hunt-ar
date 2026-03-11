@@ -183,6 +183,7 @@
 
       document.getElementById("start-btn").addEventListener("click", (e) => {
         e.preventDefault();
+
         const team = document.getElementById("team-number").value;
         const route = document.getElementById("route-select").value;
 
@@ -192,9 +193,17 @@
         }
 
         localStorage.clear();
+
+        // store team
         localStorage.setItem("bounty_team", team);
-        localStorage.setItem("bounty_route", route);
+
+        // store ONLY route letter (A,B,C,D,E)
+        const routeLetter = route.replace("Route ", "");
+        localStorage.setItem("bounty_route", routeLetter);
+
+        // start from node 0
         localStorage.setItem("bounty_step", 0);
+
         window.location.href = "hunt.html";
       });
     </script>

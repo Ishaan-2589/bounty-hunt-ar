@@ -123,6 +123,12 @@
     </div>
 
     <script>
+      const step = parseInt(localStorage.getItem("bounty_step")) || 0;
+
+      if (step < 6) {
+        alert("ACCESS DENIED: MISSION INCOMPLETE");
+        window.location.href = "index.html";
+      }
       // These keys correspond to your specific event rounds
       const key1 = "ALPHA";
       const key2 = "OMEGA";

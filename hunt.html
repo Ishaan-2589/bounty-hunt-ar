@@ -102,9 +102,19 @@
       import * as THREE from "three";
       import { MindARThree } from "mindar-image-three";
 
-      let savedRoute = localStorage.getItem("bounty_route") || "A";
-      const selectedRoute = savedRoute.replace("Route ", "");
+      const selectedRoute = localStorage.getItem("bounty_route") || "A";
       let currentStep = parseInt(localStorage.getItem("bounty_step")) || 0;
+
+      // anti-cheat protection
+      if (currentStep > 6) {
+        currentStep = 0;
+        localStorage.setItem("bounty_step", 0);
+      }
+
+      // if hunt already finished
+      if (currentStep >= 6) {
+        window.location.href = "final.html";
+      }
 
       const markerIndexMap = {
         A: 0,
@@ -125,7 +135,10 @@
             container: document.querySelector("#ar-container"),
             imageTargetSrc: "markers/targets.mind",
           });
-
+          if (!routeSteps[selectedRoute]) {
+            alert("SYSTEM ERROR: ROUTE DATA MISSING.");
+            location.reload();
+          }
           const currentNodeKey = routeSteps[selectedRoute][currentStep];
           const targetIndex = markerIndexMap[currentNodeKey];
           const anchor = mindarThree.addAnchor(targetIndex);
@@ -180,6 +193,13 @@
           .toUpperCase();
         let correctAnswer = "";
 
+        if (currentStep < 5) {
+          const nextNodeKey = routeSteps[selectedRoute][currentStep + 1];
+          correctAnswer = riddleAnswers[nextNodeKey] || "";
+        } else {
+          correctAnswer = "DOMINANCE";
+        }
+
         // Check the answer for the NEXT location, or the final override key
         if (currentStep < 5) {
           const nextNodeKey = routeSteps[selectedRoute][currentStep + 1];
@@ -190,11 +210,16 @@
 
         if (userInput === correctAnswer) {
           currentStep++;
+
           localStorage.setItem("bounty_step", currentStep);
 
+          // If all 6 nodes completed → go to final page
           if (currentStep >= 6) {
+            localStorage.setItem("hunt_status", "completed");
+
             window.location.href = "final.html";
           } else {
+            // Reload to activate next AR marker
             location.reload();
           }
         } else {
