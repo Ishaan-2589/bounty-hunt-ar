@@ -21,8 +21,24 @@
         }
       }
     </script>
+
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        background-color: #000;
+      }
+      #ar-container {
+        width: 100vw;
+        height: 100vh;
+        position: relative;
+        overflow: hidden;
+      }
+    </style>
   </head>
-  <body style="margin: 0; overflow: hidden; background-color: #000">
+  <body>
+    <div id="ar-container"></div>
+
     <div
       id="riddle-card"
       style="
@@ -106,7 +122,8 @@
       document.addEventListener("DOMContentLoaded", async () => {
         try {
           const mindarThree = new MindARThree({
-            container: document.body,
+            // THE FIX: Point the engine to the new full-screen div
+            container: document.querySelector("#ar-container"),
             imageTargetSrc: "markers/targets.mind",
           });
 
@@ -114,7 +131,6 @@
           const targetIndex = markerIndexMap[currentNodeKey];
           const anchor = mindarThree.addAnchor(targetIndex);
 
-          // Magic trigger: Shows the UI only when the target is found
           anchor.onTargetFound = () => {
             const textKey = "Route " + selectedRoute;
             if (riddles[currentNodeKey] && riddles[currentNodeKey][textKey]) {
