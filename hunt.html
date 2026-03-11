@@ -80,7 +80,7 @@
       const selectedRoute = localStorage.getItem("bounty_route") || "A";
       let currentStep = parseInt(localStorage.getItem("bounty_step")) || 0;
 
-      // Use the marker mapping from your scanner.js to ensure target index matches the .mind file
+      // Corrected marker mapping for your 10 compiled targets
       const markerIndexMap = {
         A: 0,
         B: 1,
@@ -94,7 +94,6 @@
         F: 9,
       };
 
-      // 1. Initialize the engine once
       const mindarThree = new window.MINDAR.IMAGE.MindARThree({
         container: document.body,
         imageTargetSrc: "markers/targets.mind",
@@ -108,32 +107,34 @@
         btn.disabled = true;
 
         try {
-          // 2. Determine which anchor to look for based on team route
+          // Find which marker to look for based on the current step
           const currentNodeKey = routeSteps[selectedRoute][currentStep];
           const targetIndex = markerIndexMap[currentNodeKey];
 
-          // Add the anchor BEFORE starting
+          // Add the anchor BEFORE the engine starts
           mindarThree.addAnchor(targetIndex);
 
-          // 3. Start the engine via user gesture
+          // START ENGINE (Triggered by user click)
           await mindarThree.start();
-          document.getElementById("ui-overlay").style.display = "none";
-          updateUI();
 
-          // 4. Set up the render loop
           const { renderer, scene, camera } = mindarThree;
           renderer.setAnimationLoop(() => {
             renderer.render(scene, camera);
           });
+
+          document.getElementById("ui-overlay").style.display = "none";
+          updateUI();
         } catch (err) {
-          console.error(err);
+          console.error("Camera Hardware Error:", err);
           alert(
-            "CAMERA ERROR: Ensure HTTPS is active and permissions are granted.",
+            "CAMERA ERROR: Ensure HTTPS is active and no other app is using the camera.",
           );
           btn.innerText = "RETRY";
           btn.disabled = false;
         }
       }
+
+      // ... include your existing updateUI() and unlockNextNode() functions here ...
 
       function updateUI() {
         const totalNodes = 6;
