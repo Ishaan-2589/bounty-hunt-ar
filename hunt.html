@@ -80,18 +80,24 @@
       const selectedRoute = localStorage.getItem("bounty_route") || "A";
       let currentStep = parseInt(localStorage.getItem("bounty_step")) || 0;
 
-      // Staggered Anti-Clash Routes from your pattern
-      const routeSteps = {
-        A: ["A", "H", "C", "D", "E", "F"],
-        B: ["G", "I", "D", "C", "B", "F"],
-        C: ["B", "C", "H", "A", "D", "F"],
-        D: ["I", "G", "A", "E", "C", "F"],
-        E: ["D", "E", "J", "C", "H", "F"],
+      // Use the marker mapping from your scanner.js to ensure target index matches the .mind file
+      const markerIndexMap = {
+        A: 0,
+        B: 1,
+        C: 2,
+        D: 3,
+        E: 4,
+        G: 5,
+        H: 6,
+        I: 7,
+        J: 8,
+        F: 9,
       };
 
+      // 1. Initialize the engine once
       const mindarThree = new window.MINDAR.IMAGE.MindARThree({
         container: document.body,
-        imageTargetSrc: "markers/targets.mind", // Ensure this path is correct
+        imageTargetSrc: "markers/targets.mind",
         uiLoading: "no",
         uiScanning: "yes",
       });
@@ -102,12 +108,27 @@
         btn.disabled = true;
 
         try {
-          await mindarThree.start(); // User gesture trigger
+          // 2. Determine which anchor to look for based on team route
+          const currentNodeKey = routeSteps[selectedRoute][currentStep];
+          const targetIndex = markerIndexMap[currentNodeKey];
+
+          // Add the anchor BEFORE starting
+          mindarThree.addAnchor(targetIndex);
+
+          // 3. Start the engine via user gesture
+          await mindarThree.start();
           document.getElementById("ui-overlay").style.display = "none";
           updateUI();
+
+          // 4. Set up the render loop
+          const { renderer, scene, camera } = mindarThree;
+          renderer.setAnimationLoop(() => {
+            renderer.render(scene, camera);
+          });
         } catch (err) {
+          console.error(err);
           alert(
-            "CAMERA ERROR: Please ensure you are on HTTPS and have granted permissions.",
+            "CAMERA ERROR: Ensure HTTPS is active and permissions are granted.",
           );
           btn.innerText = "RETRY";
           btn.disabled = false;
