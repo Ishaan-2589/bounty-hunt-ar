@@ -3,119 +3,200 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RECONNAISSANCE UNIT</title>
-
+    <title>ZERO HOUR : Deployment</title>
     <link rel="stylesheet" href="css/style.css" />
-    <script src="js/riddles.js"></script>
+    <style>
+      /* --- Enhanced Readability Theme --- */
+      :root {
+        --glow-color: #00e5ff; /* Soft Cyan */
+        --text-primary: #e0f7fa; /* Near White-Cyan */
+        --accent-color: #00bcd4; /* Darker Cyan */
+      }
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-three.prod.js"></script>
+      body {
+        background-color: #000b0d; /* Deep Blue-Black */
+      }
+
+      #boot-sequence {
+        text-align: left;
+        font-family: "Courier New", monospace;
+        padding: 25px;
+        min-height: 200px;
+        color: var(--text-primary);
+      }
+
+      .typewriter {
+        margin: 15px 0;
+        font-size: 1rem;
+        line-height: 1.6;
+        letter-spacing: 0.5px;
+        text-shadow: 0 0 8px rgba(0, 229, 255, 0.3);
+      }
+
+      .typewriter::after {
+        content: "_";
+        animation: cursor-blink 1s infinite;
+        color: var(--glow-color);
+      }
+
+      @keyframes cursor-blink {
+        50% {
+          opacity: 0;
+        }
+      }
+
+      .start-card {
+        background: rgba(0, 15, 20, 0.98);
+        border: 1px solid var(--accent-color);
+        box-shadow: 0 0 25px rgba(0, 188, 212, 0.2);
+      }
+
+      h1 {
+        color: var(--glow-color);
+        text-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
+      }
+
+      button {
+        background: var(--glow-color);
+        box-shadow: 0 4px 15px rgba(0, 229, 255, 0.3);
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      @keyframes glitch-appear {
+        0% {
+          opacity: 0;
+          filter: blur(10px);
+        }
+        100% {
+          opacity: 1;
+          filter: blur(0px);
+        }
+      }
+      .glitch-reveal {
+        animation: glitch-appear 0.6s ease-out forwards;
+      }
+    </style>
   </head>
-  <body>
-    <div id="scanner-container">
-      <div id="progress-container">
-        <div id="progress-bar"></div>
-        <div id="progress-text">NODE 1/6</div>
+  <body class="center-screen">
+    <div class="scanline"></div>
+
+    <div class="start-card">
+      <div id="boot-sequence">
+        <p class="typewriter" id="line1"></p>
+        <p class="typewriter" id="line2"></p>
+        <p
+          class="typewriter"
+          id="line3"
+          style="color: var(--glow-color); font-weight: bold"
+        ></p>
       </div>
 
-      <div id="riddle-card">
-        <p id="riddle-text">INITIALIZING...</p>
-        <input
-          type="text"
-          id="node-unlock-code"
-          placeholder="ENTER ACCESS KEY"
-        />
-        <button onclick="unlockNextNode()">SUBMIT DATA</button>
+      <div id="form-content" class="hidden">
+        <div class="header-box">
+          <h1>ZERO HOUR</h1>
+          <p class="subtitle" style="color: var(--accent-color)">
+            BOUNTY HUNT v1.0
+          </p>
+        </div>
+
+        <form id="team-form">
+          <div class="input-group">
+            <label style="color: var(--accent-color)">IDENTIFY TEAM</label>
+            <input
+              type="number"
+              id="team-number"
+              placeholder="(e.g. 47)"
+              required
+              style="
+                border-color: var(--accent-color);
+                color: var(--text-primary);
+              "
+            />
+          </div>
+
+          <div class="input-group">
+            <label style="color: var(--accent-color)">ASSIGNMENT ROUTE</label>
+            <select
+              id="route-select"
+              required
+              style="
+                border-color: var(--accent-color);
+                color: var(--text-primary);
+              "
+            >
+              <option value="">Select a route</option>
+              <option value="Route A">Sector Alpha</option>
+              <option value="Route B">Sector Beta</option>
+              <option value="Route C">Sector Gamma</option>
+              <option value="Route D">Sector Delta</option>
+              <option value="Route E">Sector Epsilon</option>
+            </select>
+          </div>
+
+          <button id="start-btn" type="button">INITIALIZE MISSION</button>
+          <p class="warning-text" style="color: var(--accent-color)">
+            SYSTEM ONLINE. AWAITING APEX AUTHORIZATION.
+          </p>
+        </form>
       </div>
     </div>
 
     <script>
-      let savedRoute = localStorage.getItem("bounty_route") || "A";
-      const selectedRoute = savedRoute.replace("Route ", ""); // Fixes the crash
-      let currentStep = parseInt(localStorage.getItem("bounty_step")) || 0;
+      const lines = [
+        "> UPLINK ESTABLISHED. ACCESSING ELITE DIRECTORY...",
+        "> VALIDATED: 5 TEAMS SURVIVED SCREENING. DATA QUALITY: OPTIMAL.",
+        "> STANDBY, APEX OPERATIVES. AUTHORIZING DEPLOYMENT...",
+      ];
 
-      const markerIndexMap = {
-        A: 0,
-        B: 1,
-        C: 2,
-        D: 3,
-        E: 4,
-        G: 5,
-        H: 6,
-        I: 7,
-        J: 8,
-        F: 9,
+      function typeEffect(elementId, text, speed = 35) {
+        return new Promise((resolve) => {
+          let i = 0;
+          const el = document.getElementById(elementId);
+          const timer = setInterval(() => {
+            el.innerHTML += text.charAt(i);
+            i++;
+            if (i >= text.length) {
+              clearInterval(timer);
+              resolve();
+            }
+          }, speed);
+        });
+      }
+
+      window.onload = async () => {
+        await typeEffect("line1", lines[0]);
+        await new Promise((r) => setTimeout(r, 500));
+        await typeEffect("line2", lines[1]);
+        await new Promise((r) => setTimeout(r, 800));
+        await typeEffect("line3", lines[2]);
+
+        setTimeout(() => {
+          document.getElementById("boot-sequence").style.display = "none";
+          const form = document.getElementById("form-content");
+          form.classList.remove("hidden");
+          form.classList.add("glitch-reveal");
+        }, 1500);
       };
 
-      // Exactly how your scanner.js originally worked
-      document.addEventListener("DOMContentLoaded", async () => {
-        const mindarThree = new window.MINDAR.IMAGE.MindARThree({
-          container: document.body,
-          imageTargetSrc: "markers/targets.mind",
-        });
+      document.getElementById("start-btn").addEventListener("click", (e) => {
+        e.preventDefault();
+        const team = document.getElementById("team-number").value;
+        const route = document.getElementById("route-select").value;
 
-        // Set the target for the current team's route
-        const currentNodeKey = routeSteps[selectedRoute][currentStep];
-        const targetIndex = markerIndexMap[currentNodeKey];
-        mindarThree.addAnchor(targetIndex);
-
-        try {
-          await mindarThree.start();
-          const { renderer, scene, camera } = mindarThree;
-          renderer.setAnimationLoop(() => {
-            renderer.render(scene, camera);
-          });
-
-          // Load the riddle text onto the screen
-          updateUI();
-        } catch (err) {
-          console.error("Camera Error:", err);
-          alert("Camera access denied or failed to load. Please refresh.");
+        if (!team || !route) {
+          alert("MISSION DENIED: INCOMPLETE CREDENTIALS");
+          return;
         }
+
+        localStorage.clear();
+        localStorage.setItem("bounty_team", team);
+        localStorage.setItem("bounty_route", route);
+        localStorage.setItem("bounty_step", 0);
+        window.location.href = "hunt.html";
       });
-
-      function updateUI() {
-        const totalNodes = 6;
-        const progress = (currentStep / totalNodes) * 100;
-        document.getElementById("progress-bar").style.width = progress + "%";
-
-        const displayStep = Math.min(currentStep + 1, totalNodes);
-        document.getElementById("progress-text").innerText =
-          `NODE ${displayStep}/${totalNodes}`;
-
-        const currentNodeKey = routeSteps[selectedRoute][currentStep];
-        const textKey = "Route " + selectedRoute;
-
-        if (riddles[currentNodeKey] && riddles[currentNodeKey][textKey]) {
-          document.getElementById("riddle-text").innerText =
-            riddles[currentNodeKey][textKey];
-        } else {
-          document.getElementById("riddle-text").innerText =
-            "SYSTEM LOG: Proceed to next node.";
-        }
-      }
-
-      function unlockNextNode() {
-        const userInput = document
-          .getElementById("node-unlock-code")
-          .value.trim()
-          .toUpperCase();
-        const currentNodeKey = routeSteps[selectedRoute][currentStep];
-        const correctAnswer = riddleAnswers[currentNodeKey];
-
-        if (userInput === correctAnswer) {
-          currentStep++;
-          localStorage.setItem("bounty_step", currentStep);
-
-          if (currentStep >= 6) {
-            window.location.href = "final.html"; // Go straight to final page
-          } else {
-            location.reload(); // Reload to scan the next target
-          }
-        } else {
-          alert("ACCESS DENIED: KEY INCORRECT");
-        }
-      }
     </script>
   </body>
 </html>

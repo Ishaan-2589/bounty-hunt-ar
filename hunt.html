@@ -6,52 +6,13 @@
     <title>RECONNAISSANCE UNIT</title>
 
     <link rel="stylesheet" href="css/style.css" />
-
     <script src="js/riddles.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-three.prod.js"></script>
   </head>
   <body>
-    <div
-      id="ui-overlay"
-      style="
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.9);
-        z-index: 10000;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-      "
-    >
-      <h2 style="color: #00e5ff; margin-bottom: 20px">SYSTEM READY</h2>
-      <button
-        id="start-mission-btn"
-        onclick="startMission()"
-        style="
-          padding: 15px 30px;
-          background: #00e5ff;
-          color: #000;
-          border: none;
-          font-weight: bold;
-          cursor: pointer;
-          font-family: &quot;Courier New&quot;, Courier, monospace;
-        "
-      >
-        START SCANNER
-      </button>
-      <p style="color: #666; margin-top: 15px; font-size: 0.8rem">
-        Click to grant camera permissions
-      </p>
-    </div>
-
-    <div id="scanner-container" style="display: none">
+    <div id="scanner-container">
       <div id="progress-container">
         <div id="progress-bar"></div>
         <div id="progress-text">NODE 1/6</div>
@@ -68,26 +29,11 @@
       </div>
     </div>
 
-    <div
-      id="overlay-container"
-      style="
-        pointer-events: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 20000;
-      "
-    ></div>
     <script>
-      // 1. FIX THE ROUTE MISMATCH
       let savedRoute = localStorage.getItem("bounty_route") || "A";
-      const selectedRoute = savedRoute.replace("Route ", "");
-
+      const selectedRoute = savedRoute.replace("Route ", ""); // Fixes the crash
       let currentStep = parseInt(localStorage.getItem("bounty_step")) || 0;
 
-      // Target mapping for your .mind file
       const markerIndexMap = {
         A: 0,
         B: 1,
@@ -101,47 +47,32 @@
         F: 9,
       };
 
-      // Declare the variable, but don't start the engine yet!
-      let mindarThree;
+      // Exactly how your scanner.js originally worked
+      document.addEventListener("DOMContentLoaded", async () => {
+        const mindarThree = new window.MINDAR.IMAGE.MindARThree({
+          container: document.body,
+          imageTargetSrc: "markers/targets.mind",
+        });
 
-      async function startMission() {
-        const btn = document.getElementById("start-mission-btn");
-        btn.innerText = "UPLINKING...";
-        btn.disabled = true;
+        // Set the target for the current team's route
+        const currentNodeKey = routeSteps[selectedRoute][currentStep];
+        const targetIndex = markerIndexMap[currentNodeKey];
+        mindarThree.addAnchor(targetIndex);
 
         try {
-          // THE FIX: Initialize the engine ONLY after the user clicks the button
-          if (!mindarThree) {
-            mindarThree = new window.MINDAR.IMAGE.MindARThree({
-              container: document.body,
-              imageTargetSrc: "markers/targets.mind",
-              uiLoading: "no",
-              uiScanning: "yes",
-            });
-          }
-
-          const currentNodeKey = routeSteps[selectedRoute][currentStep];
-          const targetIndex = markerIndexMap[currentNodeKey];
-
-          mindarThree.addAnchor(targetIndex);
           await mindarThree.start();
-
           const { renderer, scene, camera } = mindarThree;
           renderer.setAnimationLoop(() => {
             renderer.render(scene, camera);
           });
 
-          // Reveal the UI correctly
-          document.getElementById("ui-overlay").style.display = "none";
-          document.getElementById("scanner-container").style.display = "block";
+          // Load the riddle text onto the screen
           updateUI();
         } catch (err) {
-          console.error("SYSTEM CRASH:", err);
-          alert("REAL ERROR: " + err.message);
-          btn.innerText = "RETRY";
-          btn.disabled = false;
+          console.error("Camera Error:", err);
+          alert("Camera access denied or failed to load. Please refresh.");
         }
-      }
+      });
 
       function updateUI() {
         const totalNodes = 6;
@@ -153,7 +84,6 @@
           `NODE ${displayStep}/${totalNodes}`;
 
         const currentNodeKey = routeSteps[selectedRoute][currentStep];
-
         const textKey = "Route " + selectedRoute;
 
         if (riddles[currentNodeKey] && riddles[currentNodeKey][textKey]) {
@@ -161,7 +91,7 @@
             riddles[currentNodeKey][textKey];
         } else {
           document.getElementById("riddle-text").innerText =
-            "SYSTEM LOG: Proceed to " + riddleAnswers[currentNodeKey];
+            "SYSTEM LOG: Proceed to next node.";
         }
       }
 
@@ -178,31 +108,13 @@
           localStorage.setItem("bounty_step", currentStep);
 
           if (currentStep >= 6) {
-            showHijackSequence();
+            window.location.href = "final.html"; // Go straight to final page
           } else {
-            location.reload();
+            location.reload(); // Reload to scan the next target
           }
         } else {
           alert("ACCESS DENIED: KEY INCORRECT");
         }
-      }
-
-      function showHijackSequence() {
-        const container = document.getElementById("overlay-container");
-        container.style.pointerEvents = "auto";
-        container.innerHTML = `
-          <div class="hijack-screen" style="background:#000; width:100vw; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
-              <div class="glitch-text" style="font-size: 2.2rem; color: #ffd700;">SECTOR NEUTRALIZED</div>
-              <div style="margin: 30px 0; border: 1px solid #00e5ff; padding: 20px; background: rgba(0,229,255,0.1);">
-                  <p style="color: #fff; letter-spacing: 2px; font-size: 0.8rem;">FINAL ACCESS KEY ACQUIRED:</p>
-                  <h1 style="color: #00e5ff; font-size: 2.5rem; margin: 10px 0;">DOMINANCE</h1>
-              </div>
-              <div class="loading-bar-container" style="width:200px; height:4px; background:#333;"><div class="loading-bar-fill" style="height:100%; background:#00e5ff; width:100%; transition: width 3s linear;"></div></div>
-          </div>
-        `;
-        setTimeout(() => {
-          window.location.href = "final.html";
-        }, 5000);
       }
     </script>
   </body>
