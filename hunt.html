@@ -99,77 +99,93 @@
     </div>
 
     <script type="module">
-      import * as THREE from 'three';
-      import { MindARThree } from 'mindar-image-three';
+      import * as THREE from "three";
+      import { MindARThree } from "mindar-image-three";
 
       let savedRoute = localStorage.getItem("bounty_route") || "A";
-      const selectedRoute = savedRoute.replace("Route ", ""); 
+      const selectedRoute = savedRoute.replace("Route ", "");
       let currentStep = parseInt(localStorage.getItem("bounty_step")) || 0;
 
       const markerIndexMap = {
-        "A":0, "B":1, "C":2, "D":3, "E":4, "G":5, "H":6, "I":7, "J":8, "F":9
+        A: 0,
+        B: 1,
+        C: 2,
+        D: 3,
+        E: 4,
+        G: 5,
+        H: 6,
+        I: 7,
+        J: 8,
+        F: 9,
       };
 
       document.addEventListener("DOMContentLoaded", async () => {
-          try {
-              const mindarThree = new MindARThree({
-                  container: document.querySelector("#ar-container"),
-                  imageTargetSrc: "markers/targets.mind", 
-              });
+        try {
+          const mindarThree = new MindARThree({
+            container: document.querySelector("#ar-container"),
+            imageTargetSrc: "markers/targets.mind",
+          });
 
-              const currentNodeKey = routeSteps[selectedRoute][currentStep];
-              const targetIndex = markerIndexMap[currentNodeKey];
-              const anchor = mindarThree.addAnchor(targetIndex);
+          const currentNodeKey = routeSteps[selectedRoute][currentStep];
+          const targetIndex = markerIndexMap[currentNodeKey];
+          const anchor = mindarThree.addAnchor(targetIndex);
 
-              // MAGIC FIX: The "Off-By-One" Scavenger Hunt Shift
-              anchor.onTargetFound = () => {
-                  let displayRiddle = "";
-                  
-                  if (currentStep < 5) {
-                      // Fetch the puzzle for the NEXT location
-                      const nextNodeKey = routeSteps[selectedRoute][currentStep + 1];
-                      const textKey = "Route " + selectedRoute;
-                      
-                      if (riddles[nextNodeKey] && riddles[nextNodeKey][textKey]) {
-                          displayRiddle = riddles[nextNodeKey][textKey];
-                      } else if (riddles[nextNodeKey] && riddles[nextNodeKey]["ALL_ROUTES"]) {
-                          // Catches the Print Shop ALL_ROUTES binary
-                          displayRiddle = riddles[nextNodeKey]["ALL_ROUTES"]; 
-                      } else {
-                          displayRiddle = "SYSTEM LOG: Proceed to " + riddleAnswers[nextNodeKey];
-                      }
-                  } else {
-                      // If they are at Step 5 (The final Print Shop marker)
-                      displayRiddle = "FINAL CORE REACHED. SECTOR BREACHED. \n\nENTER OVERRIDE KEY TO NEUTRALIZE.";
-                  }
+          // MAGIC FIX: The "Off-By-One" Scavenger Hunt Shift
+          anchor.onTargetFound = () => {
+            let displayRiddle = "";
 
-                  document.getElementById("riddle-text").innerText = displayRiddle;
-                  document.getElementById("riddle-card").style.display = "block";
-              };
+            if (currentStep < 5) {
+              // Fetch the puzzle for the NEXT location
+              const nextNodeKey = routeSteps[selectedRoute][currentStep + 1];
+              const textKey = "Route " + selectedRoute;
 
-              await mindarThree.start();
-              const {renderer, scene, camera} = mindarThree;
-              renderer.setAnimationLoop(() => {
-                  renderer.render(scene, camera);
-              });
+              if (riddles[nextNodeKey] && riddles[nextNodeKey][textKey]) {
+                displayRiddle = riddles[nextNodeKey][textKey];
+              } else if (
+                riddles[nextNodeKey] &&
+                riddles[nextNodeKey]["ALL_ROUTES"]
+              ) {
+                // Catches the Print Shop ALL_ROUTES binary
+                displayRiddle = riddles[nextNodeKey]["ALL_ROUTES"];
+              } else {
+                displayRiddle =
+                  "SYSTEM LOG: Proceed to " + riddleAnswers[nextNodeKey];
+              }
+            } else {
+              // If they are at Step 5 (The final Print Shop marker)
+              displayRiddle =
+                "FINAL CORE REACHED. SECTOR BREACHED. \n\nENTER OVERRIDE KEY TO NEUTRALIZE.";
+            }
 
-          } catch (err) {
-              console.error("Crash Details:", err);
-              alert("CAMERA ERROR: " + err.message);
-          }
+            document.getElementById("riddle-text").innerText = displayRiddle;
+            document.getElementById("riddle-card").style.display = "block";
+          };
+
+          await mindarThree.start();
+          const { renderer, scene, camera } = mindarThree;
+          renderer.setAnimationLoop(() => {
+            renderer.render(scene, camera);
+          });
+        } catch (err) {
+          console.error("Crash Details:", err);
+          alert("CAMERA ERROR: " + err.message);
+        }
       });
 
       // Submit Button Logic
-      document.getElementById('submit-btn').addEventListener('click', () => {
-        const userInput = document.getElementById("node-unlock-code").value.trim().toUpperCase();
+      document.getElementById("submit-btn").addEventListener("click", () => {
+        const userInput = document
+          .getElementById("node-unlock-code")
+          .value.trim()
+          .toUpperCase();
         let correctAnswer = "";
 
         // Check the answer for the NEXT location, or the final override key
         if (currentStep < 5) {
-            const nextNodeKey = routeSteps[selectedRoute][currentStep + 1];
-            correctAnswer = riddleAnswers[nextNodeKey];
+          const nextNodeKey = routeSteps[selectedRoute][currentStep + 1];
+          correctAnswer = riddleAnswers[nextNodeKey];
         } else {
-            correctAnswer = "DOMINANCE"; // The final keyword for Round 3
+          correctAnswer = "DOMINANCE"; // The final keyword for Round 3
         }
 
         if (userInput === correctAnswer) {
@@ -177,9 +193,9 @@
           localStorage.setItem("bounty_step", currentStep);
 
           if (currentStep >= 6) {
-             window.location.href = "final.html"; 
+            window.location.href = "final.html";
           } else {
-             location.reload(); 
+            location.reload();
           }
         } else {
           alert("ACCESS DENIED: KEY INCORRECT");
