@@ -128,6 +128,8 @@
 
           // Hide the overlapping UI screen
           document.getElementById("ui-overlay").style.display = "none";
+          // Bring back the riddle card ONLY after the camera is ready
+          document.getElementById("scanner-container").style.display = "block";
           updateUI();
         } catch (err) {
           console.error(err);
