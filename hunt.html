@@ -81,7 +81,7 @@
       "
     ></div>
     <script>
-      // 1. FIX THE ROUTE MISMATCH: Turn "Route A" into just "A"
+      // 1. FIX THE ROUTE MISMATCH
       let savedRoute = localStorage.getItem("bounty_route") || "A";
       const selectedRoute = savedRoute.replace("Route ", "");
 
@@ -101,13 +101,8 @@
         F: 9,
       };
 
-      // Initialize globally
-      const mindarThree = new window.MINDAR.IMAGE.MindARThree({
-        container: document.body,
-        imageTargetSrc: "markers/targets.mind",
-        uiLoading: "no",
-        uiScanning: "yes",
-      });
+      // Declare the variable, but don't start the engine yet!
+      let mindarThree;
 
       async function startMission() {
         const btn = document.getElementById("start-mission-btn");
@@ -115,7 +110,16 @@
         btn.disabled = true;
 
         try {
-          // Now selectedRoute is correctly just "A", so this won't crash!
+          // THE FIX: Initialize the engine ONLY after the user clicks the button
+          if (!mindarThree) {
+            mindarThree = new window.MINDAR.IMAGE.MindARThree({
+              container: document.body,
+              imageTargetSrc: "markers/targets.mind",
+              uiLoading: "no",
+              uiScanning: "yes",
+            });
+          }
+
           const currentNodeKey = routeSteps[selectedRoute][currentStep];
           const targetIndex = markerIndexMap[currentNodeKey];
 
@@ -132,7 +136,6 @@
           document.getElementById("scanner-container").style.display = "block";
           updateUI();
         } catch (err) {
-          // 2. ACTUAL ERROR LOGGING: No more fake camera alerts
           console.error("SYSTEM CRASH:", err);
           alert("REAL ERROR: " + err.message);
           btn.innerText = "RETRY";
@@ -151,10 +154,8 @@
 
         const currentNodeKey = routeSteps[selectedRoute][currentStep];
 
-        // Add "Route " back just to fetch the correct riddle text from riddles.js
         const textKey = "Route " + selectedRoute;
 
-        // Safety check to ensure the riddle exists before trying to display it
         if (riddles[currentNodeKey] && riddles[currentNodeKey][textKey]) {
           document.getElementById("riddle-text").innerText =
             riddles[currentNodeKey][textKey];
@@ -190,7 +191,7 @@
         const container = document.getElementById("overlay-container");
         container.style.pointerEvents = "auto";
         container.innerHTML = `
-<div class="hijack-screen" style="background:#000; width:100vw; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+          <div class="hijack-screen" style="background:#000; width:100vw; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
               <div class="glitch-text" style="font-size: 2.2rem; color: #ffd700;">SECTOR NEUTRALIZED</div>
               <div style="margin: 30px 0; border: 1px solid #00e5ff; padding: 20px; background: rgba(0,229,255,0.1);">
                   <p style="color: #fff; letter-spacing: 2px; font-size: 0.8rem;">FINAL ACCESS KEY ACQUIRED:</p>
