@@ -6,22 +6,11 @@
     <title>RECONNAISSANCE UNIT</title>
 
     <link rel="stylesheet" href="css/style.css" />
+
     <script src="js/riddles.js"></script>
 
-    <script
-      async
-      src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
-    ></script>
-
-    <script type="importmap">
-      {
-        "imports": {
-          "three": "https://unpkg.com/three@0.147.0/build/three.module.js",
-          "three/addons/": "https://unpkg.com/three@0.147.0/examples/jsm/",
-          "mindar-image-three": "https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-three.prod.js"
-        }
-      }
-    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-three.prod.js"></script>
   </head>
   <body>
     <div
@@ -44,6 +33,7 @@
       <h2 style="color: #00e5ff; margin-bottom: 20px">SYSTEM READY</h2>
       <button
         id="start-mission-btn"
+        onclick="startMission()"
         style="
           padding: 15px 30px;
           background: #00e5ff;
@@ -74,7 +64,7 @@
           id="node-unlock-code"
           placeholder="ENTER ACCESS KEY"
         />
-        <button id="submit-btn">SUBMIT DATA</button>
+        <button onclick="unlockNextNode()">SUBMIT DATA</button>
       </div>
     </div>
 
@@ -91,10 +81,8 @@
       "
     ></div>
 
-    <script type="module">
-      import * as THREE from "three";
-      import { MindARThree } from "mindar-image-three";
-
+    <script>
+      // Load variables from local storage
       const selectedRoute = localStorage.getItem("bounty_route") || "A";
       let currentStep = parseInt(localStorage.getItem("bounty_step")) || 0;
 
@@ -112,21 +100,13 @@
         F: 9,
       };
 
-      // Initialize MindAR directly using the imported module
-      const mindarThree = new MindARThree({
+      // Initialize globally (Safe method)
+      const mindarThree = new window.MINDAR.IMAGE.MindARThree({
         container: document.body,
-        imageTargetSrc: "markers/targets.mind", // Make sure this is in a 'markers' folder!
+        imageTargetSrc: "markers/targets.mind",
         uiLoading: "no",
         uiScanning: "yes",
       });
-
-      // Because this is a module, we attach event listeners here instead of using 'onclick' in the HTML
-      document
-        .getElementById("start-mission-btn")
-        .addEventListener("click", startMission);
-      document
-        .getElementById("submit-btn")
-        .addEventListener("click", unlockNextNode);
 
       async function startMission() {
         const btn = document.getElementById("start-mission-btn");
@@ -134,12 +114,11 @@
         btn.disabled = true;
 
         try {
+          // This will now work because js/riddles.js is loaded properly!
           const currentNodeKey = routeSteps[selectedRoute][currentStep];
           const targetIndex = markerIndexMap[currentNodeKey];
 
-          // Add the specific anchor the team needs
           mindarThree.addAnchor(targetIndex);
-
           await mindarThree.start();
 
           const { renderer, scene, camera } = mindarThree;
@@ -147,6 +126,7 @@
             renderer.render(scene, camera);
           });
 
+          // Hide the overlapping UI screen
           document.getElementById("ui-overlay").style.display = "none";
           updateUI();
         } catch (err) {
