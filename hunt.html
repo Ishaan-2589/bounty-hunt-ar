@@ -11,27 +11,69 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-three.prod.js"></script>
   </head>
-  <body>
-    <div id="scanner-container">
-      <div id="progress-container">
-        <div id="progress-bar"></div>
-        <div id="progress-text">NODE 1/6</div>
-      </div>
-
-      <div id="riddle-card">
-        <p id="riddle-text">INITIALIZING...</p>
-        <input
-          type="text"
-          id="node-unlock-code"
-          placeholder="ENTER ACCESS KEY"
-        />
-        <button onclick="unlockNextNode()">SUBMIT DATA</button>
-      </div>
+  <body style="margin: 0; overflow: hidden; background-color: #000">
+    <div
+      id="riddle-card"
+      style="
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9999;
+        background: rgba(0, 20, 0, 0.95);
+        border: 2px solid #00ff00;
+        padding: 20px;
+        text-align: center;
+        width: 85%;
+        max-width: 400px;
+        box-shadow: 0 0 20px #00ff00;
+      "
+    >
+      <p
+        id="riddle-text"
+        style="
+          color: #00ff00;
+          font-family: monospace;
+          font-size: 1.1rem;
+          margin-bottom: 20px;
+        "
+      >
+        [DATA ENCRYPTED]
+      </p>
+      <input
+        type="text"
+        id="node-unlock-code"
+        placeholder="ENTER ACCESS KEY"
+        style="
+          width: 90%;
+          padding: 12px;
+          margin-bottom: 15px;
+          background: #000;
+          border: 1px solid #00ff00;
+          color: #00ff00;
+          text-align: center;
+          font-weight: bold;
+        "
+      />
+      <button
+        onclick="unlockNextNode()"
+        style="
+          width: 90%;
+          padding: 12px;
+          background: #00ff00;
+          color: #000;
+          font-weight: bold;
+          cursor: pointer;
+        "
+      >
+        SUBMIT DATA
+      </button>
     </div>
 
     <script>
       let savedRoute = localStorage.getItem("bounty_route") || "A";
-      const selectedRoute = savedRoute.replace("Route ", ""); // Fixes the crash
+      const selectedRoute = savedRoute.replace("Route ", "");
       let currentStep = parseInt(localStorage.getItem("bounty_step")) || 0;
 
       const markerIndexMap = {
@@ -47,53 +89,41 @@
         F: 9,
       };
 
-      // Exactly how your scanner.js originally worked
       document.addEventListener("DOMContentLoaded", async () => {
-        const mindarThree = new window.MINDAR.IMAGE.MindARThree({
-          container: document.body,
-          imageTargetSrc: "markers/targets.mind",
-        });
-
-        // Set the target for the current team's route
-        const currentNodeKey = routeSteps[selectedRoute][currentStep];
-        const targetIndex = markerIndexMap[currentNodeKey];
-        mindarThree.addAnchor(targetIndex);
-
         try {
+          const mindarThree = new window.MINDAR.IMAGE.MindARThree({
+            container: document.body,
+            imageTargetSrc: "markers/targets.mind",
+          });
+
+          const currentNodeKey = routeSteps[selectedRoute][currentStep];
+          const targetIndex = markerIndexMap[currentNodeKey];
+          const anchor = mindarThree.addAnchor(targetIndex);
+
+          // MAGIC FIX: The Riddle Box ONLY appears when the camera sees the marker!
+          anchor.onTargetFound = () => {
+            const textKey = "Route " + selectedRoute;
+            if (riddles[currentNodeKey] && riddles[currentNodeKey][textKey]) {
+              document.getElementById("riddle-text").innerText =
+                riddles[currentNodeKey][textKey];
+            } else {
+              document.getElementById("riddle-text").innerText =
+                "SYSTEM LOG: Proceed to " + riddleAnswers[currentNodeKey];
+            }
+            // Reveal the box!
+            document.getElementById("riddle-card").style.display = "block";
+          };
+
           await mindarThree.start();
           const { renderer, scene, camera } = mindarThree;
           renderer.setAnimationLoop(() => {
             renderer.render(scene, camera);
           });
-
-          // Load the riddle text onto the screen
-          updateUI();
         } catch (err) {
-          console.error("Camera Error:", err);
-          alert("Camera access denied or failed to load. Please refresh.");
+          console.error("Crash Details:", err);
+          alert("CAMERA ERROR: " + err.message);
         }
       });
-
-      function updateUI() {
-        const totalNodes = 6;
-        const progress = (currentStep / totalNodes) * 100;
-        document.getElementById("progress-bar").style.width = progress + "%";
-
-        const displayStep = Math.min(currentStep + 1, totalNodes);
-        document.getElementById("progress-text").innerText =
-          `NODE ${displayStep}/${totalNodes}`;
-
-        const currentNodeKey = routeSteps[selectedRoute][currentStep];
-        const textKey = "Route " + selectedRoute;
-
-        if (riddles[currentNodeKey] && riddles[currentNodeKey][textKey]) {
-          document.getElementById("riddle-text").innerText =
-            riddles[currentNodeKey][textKey];
-        } else {
-          document.getElementById("riddle-text").innerText =
-            "SYSTEM LOG: Proceed to next node.";
-        }
-      }
 
       function unlockNextNode() {
         const userInput = document
@@ -108,9 +138,9 @@
           localStorage.setItem("bounty_step", currentStep);
 
           if (currentStep >= 6) {
-            window.location.href = "final.html"; // Go straight to final page
+            window.location.href = "final.html";
           } else {
-            location.reload(); // Reload to scan the next target
+            location.reload();
           }
         } else {
           alert("ACCESS DENIED: KEY INCORRECT");
