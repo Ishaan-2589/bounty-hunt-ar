@@ -3,92 +3,46 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RECONNAISSANCE UNIT - AR</title>
+    <title>RECONNAISSANCE UNIT - INTEGRATED</title>
     
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
-    <script src="js/riddles.js"></script>
 
     <style>
-      body {
-        margin: 0;
-        overflow: hidden;
-        background-color: #000;
-      }
-      /* Riddle Card: Sabse upar dikhna chahiye */
+      body { margin: 0; overflow: hidden; background-color: #000; font-family: 'Courier New', Courier, monospace; }
+      
       #riddle-card {
-        display: none;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 10000; /* Super High Z-Index */
-        background: rgba(0, 15, 0, 0.98);
-        border: 2px solid #00ff00;
-        padding: 25px;
-        text-align: center;
-        width: 85%;
-        max-width: 380px;
-        box-shadow: 0 0 30px #00ff00;
-        color: #00ff00;
-        font-family: 'Courier New', Courier, monospace;
+        display: none; position: fixed; top: 50%; left: 50%;
+        transform: translate(-50%, -50%); z-index: 10000;
+        background: rgba(0, 15, 0, 0.98); border: 2px solid #00ff00;
+        padding: 25px; text-align: center; width: 85%; max-width: 380px;
+        box-shadow: 0 0 30px #00ff00; color: #00ff00;
       }
-      .loading-bar-container {
-        width: 100%;
-        background: #002200;
-        height: 12px;
-        margin: 20px 0;
-        border: 1px solid #00ff00;
+
+      #force-trigger {
+        position: fixed; bottom: 10px; width: 100%; text-align: center;
+        z-index: 5000; color: rgba(0, 255, 0, 0.3); font-size: 10px; cursor: pointer;
       }
-      .loading-bar-fill {
-        width: 0%;
-        height: 100%;
-        background: #00ff00;
-        animation: fillBar 1.5s ease-in-out forwards;
-      }
-      @keyframes fillBar {
-        to { width: 100%; }
-      }
-      input {
-        width: 90%;
-        padding: 12px;
-        margin: 15px 0;
-        background: #000;
-        border: 1px solid #00ff00;
-        color: #00ff00;
-        text-align: center;
-        font-size: 1rem;
-        outline: none;
-      }
-      button {
-        width: 95%;
-        padding: 14px;
-        background: #00ff00;
-        color: #000;
-        font-weight: bold;
-        border: none;
-        cursor: pointer;
-        font-size: 1rem;
-        text-transform: uppercase;
-      }
-      button:active {
-        background: #008800;
-      }
+
+      .loading-bar { width: 100%; background: #002200; height: 10px; margin: 15px 0; border: 1px solid #00ff00; }
+      .bar-fill { width: 0%; height: 100%; background: #00ff00; animation: fill 1.2s forwards; }
+      @keyframes fill { to { width: 100%; } }
+      input { width: 90%; padding: 12px; margin: 15px 0; background: #000; border: 1px solid #00ff00; color: #00ff00; text-align: center; }
+      button { width: 95%; padding: 14px; background: #00ff00; color: #000; font-weight: bold; border: none; cursor: pointer; }
     </style>
   </head>
 
   <body>
     <div id="riddle-card"></div>
+    <div id="force-trigger" onclick="handleScanSuccess()">[ TAP IF SCAN FAILS ]</div>
 
     <a-scene
-      mindar-image="imageTargetSrc: markers/targets.mind?v=7; autoStart: true; uiLoading: yes; uiScanning: yes;"
-      color-space="sRGB"
-      renderer="colorManagement: true, physicallyCorrectLights"
+      mindar-image="imageTargetSrc: markers/targets.mind?v=11; autoStart: true; uiScanning: yes;"
       vr-mode-ui="enabled: false"
       device-orientation-permission-ui="enabled: false"
     >
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-
+      
       <a-entity id="anchor0" mindar-image-target="targetIndex: 0"></a-entity>
       <a-entity id="anchor1" mindar-image-target="targetIndex: 1"></a-entity>
       <a-entity id="anchor2" mindar-image-target="targetIndex: 2"></a-entity>
@@ -102,87 +56,86 @@
     </a-scene>
 
     <script>
+      // --- DATA INTEGRATED DIRECTLY ---
+      const routeSteps = {
+        "A": ["A","H","C","D","E","F"],
+        "B": ["G","I","D","C","B","F"],
+        "C": ["B","C","H","A","D","F"],
+        "D": ["I","G","A","E","C","F"],
+        "E": ["D","E","J","C","H","F"]
+      };
+
+      const riddles = {
+        "A": { "Route A": "16-1-18-11-9-14-7", "ALL_ROUTES": "Parking Area Node" },
+        "B": { "Route B": "Dmbttft mjf po cpui nz tjeft...", "ALL_ROUTES": "Lobby Area Node" },
+        "C": { "ALL_ROUTES": "Canteen Station: Recharge your cells here." },
+        "D": { "ALL_ROUTES": "Auditorium: Where echoes resonate." },
+        "E": { "ALL_ROUTES": "Class F1: Before the knowledge resonates..." },
+        "F": { "ALL_ROUTES": "01001001 00100000 01110000..." },
+        "G": { "ALL_ROUTES": "Class F2: 18-15-15-13_6-two" },
+        "H": { "ALL_ROUTES": "The Stone Steps: - .... . / ... - --- -. . / ... - --- -. ." },
+        "I": { "ALL_ROUTES": "Security: 01000010 01100101 01100110 01101111 01110010 01100101" },
+        "J": { "ALL_ROUTES": "Gate: Every path starts here." }
+      };
+
+      const riddleAnswers = {
+        "A":"PARKING", "B":"LOBBY", "C":"CANTEEN", "D":"AUDITORIUM", 
+        "E":"CLASS F1", "F":"PRINT SHOP", "G":"CLASS F2", "H":"STAIRS", "I":"SECURITY", "J":"GATE"
+      };
+
+      const markerIndexMap = { A:0, B:1, C:2, D:3, E:4, G:5, H:6, I:7, J:8, F:9 };
+
+      // --- LOGIC ---
       const selectedRoute = localStorage.getItem("bounty_route") || "A";
       let currentStep = parseInt(localStorage.getItem("bounty_step")) || 0;
-      
-      const markerIndexMap = {
-        A: 0, B: 1, C: 2, D: 3, E: 4, G: 5, H: 6, I: 7, J: 8, F: 9
-      };
 
       if (currentStep >= 6) window.location.href = "final.html";
 
-      const sceneEl = document.querySelector("a-scene");
+      function handleScanSuccess() {
+        const card = document.getElementById("riddle-card");
+        if (card.style.display === "block") return;
 
-      // Scene render start hote hi logic load hoga
-      sceneEl.addEventListener("renderstart", () => {
+        const currentNodeKey = routeSteps[selectedRoute][currentStep];
+        card.style.display = "block";
+        card.innerHTML = `<h3>TARGET FOUND</h3><div class="loading-bar"><div class="bar-fill"></div></div>`;
+        
+        setTimeout(() => { showRiddle(currentNodeKey); }, 1300);
+      }
+
+      document.querySelector("a-scene").addEventListener("renderstart", () => {
         const currentNodeKey = routeSteps[selectedRoute][currentStep];
         const targetIndex = markerIndexMap[currentNodeKey];
         const activeAnchor = document.querySelector(`#anchor${targetIndex}`);
-
-        console.log("System Active. Scanning for Node:", currentNodeKey);
-
-        if (activeAnchor) {
-          activeAnchor.addEventListener("targetFound", () => {
-            const card = document.getElementById("riddle-card");
-            
-            // Multiple triggers rokne ke liye
-            if (card.style.display === "block") return;
-
-            card.style.display = "block";
-            card.innerHTML = `
-              <h2 style="margin:0;">TARGET LOCKED</h2>
-              <div class="loading-bar-container"><div class="loading-bar-fill"></div></div>
-              <p style="font-size:0.8rem;">EXTRACTING ENCRYPTED DATA...</p>
-            `;
-
-            setTimeout(() => {
-              showRiddleUI(currentNodeKey);
-            }, 1600);
-          });
+        if(activeAnchor) {
+          activeAnchor.addEventListener("targetFound", () => { handleScanSuccess(); });
         }
       });
 
-      function showRiddleUI(currentNodeKey) {
+      function showRiddle(currentNodeKey) {
         const card = document.getElementById("riddle-card");
-        
         if (currentStep < 5) {
           const nextNodeKey = routeSteps[selectedRoute][currentStep + 1];
           const textKey = "Route " + selectedRoute;
-          
-          let displayRiddle = "SYSTEM ERROR: DATA MISSING";
-          if (riddles[nextNodeKey]) {
-            displayRiddle = riddles[nextNodeKey][textKey] || 
-                             riddles[nextNodeKey]["ALL_ROUTES"] || 
-                             riddles[nextNodeKey]["ALL ROUTES"];
-          }
+          const displayRiddle = (riddles[nextNodeKey] && riddles[nextNodeKey][textKey]) 
+                                 ? riddles[nextNodeKey][textKey] 
+                                 : riddles[nextNodeKey]["ALL_ROUTES"];
 
           card.innerHTML = `
-            <p style="font-size:1.1rem; line-height:1.4;">${displayRiddle}</p>
-            <input type="text" id="node-unlock-code" placeholder="ENTER ACCESS KEY">
-            <button id="submit-btn">UPLOAD KEY</button>
+            <p>${displayRiddle}</p>
+            <input type="text" id="answer-input" placeholder="ENTER KEYCODE">
+            <button id="submit-btn">DECRYPT</button>
           `;
 
           document.getElementById("submit-btn").onclick = () => {
-            const userInput = document.getElementById("node-unlock-code").value.trim().toUpperCase();
-            if (userInput === riddleAnswers[nextNodeKey]) {
+            const val = document.getElementById("answer-input").value.trim().toUpperCase();
+            if (val === riddleAnswers[nextNodeKey]) {
               localStorage.setItem("bounty_step", currentStep + 1);
               location.reload();
-            } else {
-              alert("ACCESS DENIED: INVALID KEY");
-            }
+            } else { alert("ACCESS DENIED"); }
           };
         } else {
-          // Final Node Logic
-          card.innerHTML = `
-            <h2 style="color:#ffd700;">MISSION COMPLETE</h2>
-            <p>CORE SECURITY COLLAPSED</p>
-            <h1 style="color:#fff;">KEY: DOMINANCE</h1>
-            <p>REDIRECTING TO COMMAND CENTER...</p>
-          `;
-          setTimeout(() => {
-            localStorage.setItem("bounty_step", 6);
-            window.location.href = "final.html";
-          }, 4000);
+          card.innerHTML = `<h1>WINNER</h1><h2>KEY: DOMINANCE</h2>`;
+          setTimeout(() => { localStorage.setItem("bounty_step", 6); window.location.href = "final.html"; }, 3000);
         }
       }
     </script>
