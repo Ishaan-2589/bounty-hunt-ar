@@ -106,61 +106,61 @@ device-orientation-permission-ui="enabled:false"
             // ... script ke andar jahan displayRiddle generate ho raha hai ...
 
             card.innerHTML = `
-<div style="text-align: left; margin-bottom: 8px; border-bottom: 1px solid #00ff00; padding-bottom: 5px;">
-    <span style="font-size: 0.7rem; color: #88ff88; letter-spacing: 1px;">[ STATUS: DATA_RECOVERY_SUCCESS ]</span>
+<div style="text-align: left; margin-bottom: 5px; border-bottom: 1px solid #00ff00; padding-bottom: 3px;">
+    <span style="font-size: 0.65rem; color: #88ff88;">[ SYSTEM: DATA_STREAM ]</span>
 </div>
 
 <div style="
     width: 100%;
-    min-height: 180px; 
+    min-height: 120px; /* Box ka size chhota kar diya */
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    margin-bottom: 15px;
-    background: rgba(0, 40, 0, 0.3);
-    padding: 15px; /* Increased padding */
+    justify-content: center; /* Vertically center */
+    align-items: center;    /* Horizontally center */
+    margin-bottom: 12px;
+    background: rgba(0, 40, 0, 0.2);
     box-sizing: border-box;
 ">
-    <p style="font-size: 0.8rem; color: #00ff00; margin: 0 0 10px 0; text-align: left; font-weight: bold;">
+    <p style="font-size: 0.75rem; color: #00ff00; margin: 0 0 8px 0; width: 100%; text-align: left; font-weight: bold;">
         > MISSION_LOG:
     </p>
     
     <div id="riddle-text" style="
         white-space: pre-wrap; 
-        overflow-wrap: anywhere; /* Hard break for long strings */
-        word-wrap: break-word;
-        font-size: 0.9rem; 
-        line-height: 1.8; /* Increased line height for Morse code */
+        overflow-wrap: anywhere; 
+        word-break: break-all; 
+        font-size: 0.85rem; /* Font thoda aur chhota taaki wrap sahi ho */
+        line-height: 1.6;
         color: #ffffff;
-        text-align: center;
+        text-align: center; /* Text alignment center lock */
         width: 100%;
+        padding: 0 5px;
     ">
         ${displayRiddle}
     </div>
 </div>
 
-<div style="width: 100%;">
-    <input id="answer" placeholder="ENTER ACCESS KEY" style="
-        width: 100%; /* Full width within container padding */
-        padding: 12px; 
-        background: #000; 
-        border: 1px solid #00ff00; 
-        color: #00ff00; 
-        margin-bottom: 12px;
-        text-align: center;
-        box-sizing: border-box;
-    ">
+<input id="answer" placeholder="ENTER ACCESS KEY" style="
+    width: 100%; 
+    padding: 10px; 
+    background: #000; 
+    border: 1px solid #00ff00; 
+    color: #00ff00; 
+    margin-bottom: 10px;
+    text-align: center;
+    box-sizing: border-box;
+    font-size: 0.9rem;
+">
 
-    <button onclick="checkAnswer('${nextNodeKey}')" style="
-        width: 100%; 
-        padding: 14px; 
-        background: #00ff00; 
-        color: #000; 
-        font-weight: bold;
-        text-transform: uppercase;
-        box-sizing: border-box;
-    ">SUBMIT DATA</button>
-</div>
+<button onclick="checkAnswer('${nextNodeKey}')" style="
+    width: 100%; 
+    padding: 12px; 
+    background: #00ff00; 
+    color: #000; 
+    font-weight: bold;
+    text-transform: uppercase;
+    box-sizing: border-box;
+">SUBMIT DATA</button>
 `;
           } else {
             card.innerHTML = `<h2>CORE SECURITY COLLAPSED</h2><h1>KEY 03: DOMINANCE</h1>`;
