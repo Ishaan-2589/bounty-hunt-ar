@@ -359,3 +359,55 @@ button:hover {
     display: block;
     margin-bottom: 15px;
 }
+
+/* FINAL KEY ANIMATION */
+
+.terminal{
+  text-align:center;
+  color:#00ff00;
+}
+
+.terminal-line{
+  font-size:0.8rem;
+  margin:6px 0;
+  opacity:0;
+  animation:fadeIn 1s forwards;
+}
+
+.terminal-line:nth-child(1){animation-delay:0.3s}
+.terminal-line:nth-child(2){animation-delay:0.9s}
+.terminal-line:nth-child(4){animation-delay:1.8s}
+
+@keyframes fadeIn{
+  to{opacity:1}
+}
+
+.glitch{
+  color:#ff0000;
+  animation:glitch 0.3s infinite alternate;
+}
+
+@keyframes glitch{
+  from{transform:translateX(-2px)}
+  to{transform:translateX(2px)}
+}
+
+.victory{
+  margin-top:15px;
+  color:#00ff00;
+  text-shadow:0 0 10px #00ff00;
+  animation:pulse 1.2s infinite;
+}
+
+.key{
+  font-size:2rem;
+  letter-spacing:4px;
+  color:#00ff00;
+  text-shadow:0 0 20px #00ff00;
+}
+
+@keyframes pulse{
+  0%{transform:scale(1)}
+  50%{transform:scale(1.1)}
+  100%{transform:scale(1)}
+}
