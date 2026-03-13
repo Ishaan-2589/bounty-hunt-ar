@@ -125,7 +125,16 @@ device-orientation-permission-ui="enabled:false"
           .value.trim()
           .toUpperCase();
 
-        if (val === riddleAnswers[node]) {
+        // Get the array of valid answers for this node (location)
+        const validAnswers = riddleAnswers[node];
+
+        // Check if the input exists in the array
+        if (Array.isArray(validAnswers) && validAnswers.includes(val)) {
+          currentStep++;
+          localStorage.setItem("bounty_step", currentStep);
+          location.reload();
+        } else if (val === validAnswers) {
+          // This part is a backup in case some answers are still single strings
           currentStep++;
           localStorage.setItem("bounty_step", currentStep);
           location.reload();
