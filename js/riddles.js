@@ -1,4 +1,4 @@
-alp// ROUTE ORDER (Based on PDF Deployment Table)
+// ROUTE ORDER (Based on PDF Deployment Table)
 const routeSteps = {
   "A": ["A", "H", "C", "D", "E", "F"],
   "B": ["G", "I", "D", "C", "B", "F"],
