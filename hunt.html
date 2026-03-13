@@ -110,11 +110,15 @@
 
       if (currentStep >= 6) window.location.href = "final.html";
 
-      document.addEventListener("DOMContentLoaded", () => {
+      document.querySelector("a-scene").addEventListener("loaded", () => {
         const currentNodeKey = routeSteps[selectedRoute][currentStep];
         const targetIndex = markerIndexMap[currentNodeKey];
         const activeAnchor = document.querySelector(`#anchor${targetIndex}`);
 
+        if (!activeAnchor){
+          console.error("Anchor not found for", currentNodeKey);
+          return
+        }
         activeAnchor.addEventListener("targetFound", () => {
           const card = document.getElementById("riddle-card");
           card.style.display = "block";
@@ -130,11 +134,15 @@
             if (currentStep < 5) {
               const nextNodeKey = routeSteps[selectedRoute][currentStep + 1];
               const textKey = "Route " + selectedRoute;
-              const displayRiddle =
-                riddles[nextNodeKey] && riddles[nextNodeKey][textKey]
-                  ? riddles[nextNodeKey][textKey]
-                  : riddles[nextNodeKey]["ALL_ROUTES"];
-
+              let displayRiddle = "SYSTEM ERROR: RIDDLE NOT FOUND";
+              
+              if (riddles[nextNodeKey]) {
+                if(riddles[nextNodeKey][textKey]){
+                  displayRiddle = riddles[nextNodeKey][textKey];
+                } else if (riddles[nextNodeKey]["ALL ROUTES"]) {
+                  displayRiddle = riddles[nextNodeKey]["ALL ROUTES"];
+                }
+              }
               card.innerHTML = `
                             <p id="riddle-text">${displayRiddle}</p>
                             <input type="text" id="node-unlock-code" placeholder="ENTER ACCESS KEY">
