@@ -1,8 +1,10 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RECONNAISSANCE UNIT</title>
+    <title>RECONNAISSANCE UNIT - AR</title>
+    
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
     <script src="js/riddles.js"></script>
@@ -13,57 +15,64 @@
         overflow: hidden;
         background-color: #000;
       }
+      /* Riddle Card: Sabse upar dikhna chahiye */
       #riddle-card {
         display: none;
         position: fixed;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        z-index: 9999;
-        background: rgba(0, 20, 0, 0.95);
+        z-index: 10000; /* Super High Z-Index */
+        background: rgba(0, 15, 0, 0.98);
         border: 2px solid #00ff00;
-        padding: 20px;
+        padding: 25px;
         text-align: center;
         width: 85%;
-        max-width: 400px;
-        box-shadow: 0 0 20px #00ff00;
+        max-width: 380px;
+        box-shadow: 0 0 30px #00ff00;
         color: #00ff00;
-        font-family: monospace;
+        font-family: 'Courier New', Courier, monospace;
       }
       .loading-bar-container {
         width: 100%;
-        background: #003300;
-        height: 10px;
-        margin: 15px 0;
+        background: #002200;
+        height: 12px;
+        margin: 20px 0;
+        border: 1px solid #00ff00;
       }
       .loading-bar-fill {
         width: 0%;
         height: 100%;
         background: #00ff00;
-        animation: fillBar 1.2s forwards;
+        animation: fillBar 1.5s ease-in-out forwards;
       }
       @keyframes fillBar {
-        to {
-          width: 100%;
-        }
+        to { width: 100%; }
       }
       input {
         width: 90%;
         padding: 12px;
-        margin: 10px 0;
+        margin: 15px 0;
         background: #000;
         border: 1px solid #00ff00;
         color: #00ff00;
         text-align: center;
+        font-size: 1rem;
+        outline: none;
       }
       button {
-        width: 90%;
-        padding: 12px;
+        width: 95%;
+        padding: 14px;
         background: #00ff00;
         color: #000;
         font-weight: bold;
         border: none;
         cursor: pointer;
+        font-size: 1rem;
+        text-transform: uppercase;
+      }
+      button:active {
+        background: #008800;
       }
     </style>
   </head>
@@ -72,7 +81,7 @@
     <div id="riddle-card"></div>
 
     <a-scene
-      mindar-image="imageTargetSrc: markers/targets.mind?v=5; autoStart: true; uiLoading: yes; uiScanning: yes;"
+      mindar-image="imageTargetSrc: markers/targets.mind?v=7; autoStart: true; uiLoading: yes; uiScanning: yes;"
       color-space="sRGB"
       renderer="colorManagement: true, physicallyCorrectLights"
       vr-mode-ui="enabled: false"
@@ -95,86 +104,87 @@
     <script>
       const selectedRoute = localStorage.getItem("bounty_route") || "A";
       let currentStep = parseInt(localStorage.getItem("bounty_step")) || 0;
+      
       const markerIndexMap = {
-        A: 0,
-        B: 1,
-        C: 2,
-        D: 3,
-        E: 4,
-        G: 5,
-        H: 6,
-        I: 7,
-        J: 8,
-        F: 9,
+        A: 0, B: 1, C: 2, D: 3, E: 4, G: 5, H: 6, I: 7, J: 8, F: 9
       };
 
       if (currentStep >= 6) window.location.href = "final.html";
 
-      document.querySelector("a-scene").addEventListener("loaded", () => {
+      const sceneEl = document.querySelector("a-scene");
+
+      // Scene render start hote hi logic load hoga
+      sceneEl.addEventListener("renderstart", () => {
         const currentNodeKey = routeSteps[selectedRoute][currentStep];
         const targetIndex = markerIndexMap[currentNodeKey];
         const activeAnchor = document.querySelector(`#anchor${targetIndex}`);
 
-        if (!activeAnchor){
-          console.error("Anchor not found for", currentNodeKey);
-          return
+        console.log("System Active. Scanning for Node:", currentNodeKey);
+
+        if (activeAnchor) {
+          activeAnchor.addEventListener("targetFound", () => {
+            const card = document.getElementById("riddle-card");
+            
+            // Multiple triggers rokne ke liye
+            if (card.style.display === "block") return;
+
+            card.style.display = "block";
+            card.innerHTML = `
+              <h2 style="margin:0;">TARGET LOCKED</h2>
+              <div class="loading-bar-container"><div class="loading-bar-fill"></div></div>
+              <p style="font-size:0.8rem;">EXTRACTING ENCRYPTED DATA...</p>
+            `;
+
+            setTimeout(() => {
+              showRiddleUI(currentNodeKey);
+            }, 1600);
+          });
         }
-        let detected=false;
-        activeAnchor.addEventListener("targetFound", () => {
-          if(detected) return;
-          detected=true;
-          const card = document.getElementById("riddle-card");
-          card.style.display = "block";
+      });
+
+      function showRiddleUI(currentNodeKey) {
+        const card = document.getElementById("riddle-card");
+        
+        if (currentStep < 5) {
+          const nextNodeKey = routeSteps[selectedRoute][currentStep + 1];
+          const textKey = "Route " + selectedRoute;
+          
+          let displayRiddle = "SYSTEM ERROR: DATA MISSING";
+          if (riddles[nextNodeKey]) {
+            displayRiddle = riddles[nextNodeKey][textKey] || 
+                             riddles[nextNodeKey]["ALL_ROUTES"] || 
+                             riddles[nextNodeKey]["ALL ROUTES"];
+          }
 
           card.innerHTML = `
-                    <h3>TARGET DETECTED</h3>
-                    <p>SCANNING NODE...</p>
-                    <div class="loading-bar-container"><div class="loading-bar-fill"></div></div>
-                    <p>DECRYPTING DATA STREAM...</p>
-                `;
+            <p style="font-size:1.1rem; line-height:1.4;">${displayRiddle}</p>
+            <input type="text" id="node-unlock-code" placeholder="ENTER ACCESS KEY">
+            <button id="submit-btn">UPLOAD KEY</button>
+          `;
 
-          setTimeout(() => {
-            if (currentStep < 5) {
-              const nextNodeKey = routeSteps[selectedRoute][currentStep + 1];
-              const textKey = "Route " + selectedRoute;
-              let displayRiddle = "SYSTEM ERROR: RIDDLE NOT FOUND";
-              
-              if (riddles[nextNodeKey]) {
-                if(riddles[nextNodeKey][textKey]){
-                  displayRiddle = riddles[nextNodeKey][textKey];
-                } else if (riddles[nextNodeKey]["ALL_ROUTES"]) {
-                  displayRiddle = riddles[nextNodeKey]["ALL_ROUTES"];
-                }
-              }
-              card.innerHTML = `
-                            <p id="riddle-text">${displayRiddle}</p>
-                            <input type="text" id="node-unlock-code" placeholder="ENTER ACCESS KEY">
-                            <button id="submit-btn">SUBMIT DATA</button>
-                        `;
-
-              document.getElementById("submit-btn").onclick = () => {
-                const userInput = document
-                  .getElementById("node-unlock-code")
-                  .value.trim()
-                  .toUpperCase();
-                if (userInput === riddleAnswers[nextNodeKey]) {
-                  currentStep++;
-                  localStorage.setItem("bounty_step", currentStep);
-                  location.reload();
-                } else {
-                  alert("ACCESS DENIED: KEY INCORRECT");
-                }
-              };
+          document.getElementById("submit-btn").onclick = () => {
+            const userInput = document.getElementById("node-unlock-code").value.trim().toUpperCase();
+            if (userInput === riddleAnswers[nextNodeKey]) {
+              localStorage.setItem("bounty_step", currentStep + 1);
+              location.reload();
             } else {
-              card.innerHTML = `<h2>CORE SECURITY COLLAPSED</h2><h1>KEY 03: DOMINANCE</h1>`;
-              setTimeout(() => {
-                localStorage.setItem("bounty_step", 6);
-                window.location.href = "final.html";
-              }, 3500);
+              alert("ACCESS DENIED: INVALID KEY");
             }
-          }, 1500);
-        });
-      });
+          };
+        } else {
+          // Final Node Logic
+          card.innerHTML = `
+            <h2 style="color:#ffd700;">MISSION COMPLETE</h2>
+            <p>CORE SECURITY COLLAPSED</p>
+            <h1 style="color:#fff;">KEY: DOMINANCE</h1>
+            <p>REDIRECTING TO COMMAND CENTER...</p>
+          `;
+          setTimeout(() => {
+            localStorage.setItem("bounty_step", 6);
+            window.location.href = "final.html";
+          }, 4000);
+        }
+      }
     </script>
   </body>
 </html>
