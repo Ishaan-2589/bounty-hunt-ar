@@ -1,26 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RECONNAISSANCE UNIT</title>
-
-    <link rel="stylesheet" href="css/style.css" />
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
     <script src="js/riddles.js"></script>
-
-    <script
-      async
-      src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
-    ></script>
-    <script type="importmap">
-      {
-        "imports": {
-          "three": "https://unpkg.com/three@0.147.0/build/three.module.js",
-          "three/addons/": "https://unpkg.com/three@0.147.0/examples/jsm/",
-          "mindar-image-three": "https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-three.prod.js"
-        }
-      }
-    </script>
 
     <style>
       body {
@@ -28,20 +13,7 @@
         overflow: hidden;
         background-color: #000;
       }
-      #ar-container {
-        width: 100vw;
-        height: 100vh;
-        position: relative;
-        overflow: hidden;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="ar-container"></div>
-
-    <div
-      id="riddle-card"
-      style="
+      #riddle-card {
         display: none;
         position: fixed;
         top: 50%;
@@ -55,67 +27,74 @@
         width: 85%;
         max-width: 400px;
         box-shadow: 0 0 20px #00ff00;
-      "
+        color: #00ff00;
+        font-family: monospace;
+      }
+      .loading-bar-container {
+        width: 100%;
+        background: #003300;
+        height: 10px;
+        margin: 15px 0;
+      }
+      .loading-bar-fill {
+        width: 0%;
+        height: 100%;
+        background: #00ff00;
+        animation: fillBar 1.2s forwards;
+      }
+      @keyframes fillBar {
+        to {
+          width: 100%;
+        }
+      }
+      input {
+        width: 90%;
+        padding: 12px;
+        margin: 10px 0;
+        background: #000;
+        border: 1px solid #00ff00;
+        color: #00ff00;
+        text-align: center;
+      }
+      button {
+        width: 90%;
+        padding: 12px;
+        background: #00ff00;
+        color: #000;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="riddle-card"></div>
+
+    <a-scene
+      mindar-image="imageTargetSrc: markers/targets.mind?v=5; autoStart: true; uiLoading: yes; uiScanning: yes;"
+      color-space="sRGB"
+      renderer="colorManagement: true, physicallyCorrectLights"
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: false"
     >
-      <p
-        id="riddle-text"
-        style="
-          color: #00ff00;
-          font-family: monospace;
-          font-size: 1.1rem;
-          margin-bottom: 20px;
-        "
-      >
-        [DATA ENCRYPTED]
-      </p>
-      <input
-        type="text"
-        id="node-unlock-code"
-        placeholder="ENTER ACCESS KEY"
-        style="
-          width: 90%;
-          padding: 12px;
-          margin-bottom: 15px;
-          background: #000;
-          border: 1px solid #00ff00;
-          color: #00ff00;
-          text-align: center;
-          font-weight: bold;
-        "
-      />
-      <button
-        id="submit-btn"
-        style="
-          width: 90%;
-          padding: 12px;
-          background: #00ff00;
-          color: #000;
-          font-weight: bold;
-          cursor: pointer;
-        "
-      >
-        SUBMIT DATA
-      </button>
-    </div>
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-    <script type="module">
-      import * as THREE from "three";
-      import { MindARThree } from "mindar-image-three";
+      <a-entity id="anchor0" mindar-image-target="targetIndex: 0"></a-entity>
+      <a-entity id="anchor1" mindar-image-target="targetIndex: 1"></a-entity>
+      <a-entity id="anchor2" mindar-image-target="targetIndex: 2"></a-entity>
+      <a-entity id="anchor3" mindar-image-target="targetIndex: 3"></a-entity>
+      <a-entity id="anchor4" mindar-image-target="targetIndex: 4"></a-entity>
+      <a-entity id="anchor5" mindar-image-target="targetIndex: 5"></a-entity>
+      <a-entity id="anchor6" mindar-image-target="targetIndex: 6"></a-entity>
+      <a-entity id="anchor7" mindar-image-target="targetIndex: 7"></a-entity>
+      <a-entity id="anchor8" mindar-image-target="targetIndex: 8"></a-entity>
+      <a-entity id="anchor9" mindar-image-target="targetIndex: 9"></a-entity>
+    </a-scene>
 
+    <script>
       const selectedRoute = localStorage.getItem("bounty_route") || "A";
       let currentStep = parseInt(localStorage.getItem("bounty_step")) || 0;
-
-      // anti-cheat protection
-      if (currentStep > 6) {
-        currentStep = 0;
-        localStorage.setItem("bounty_step", 0);
-      }
-
-      // if hunt already finished
-      if (currentStep >= 6) {
-        window.location.href = "final.html";
-      }
-
       const markerIndexMap = {
         A: 0,
         B: 1,
@@ -129,218 +108,62 @@
         F: 9,
       };
 
-      document.addEventListener("DOMContentLoaded", async () => {
-        try {
-          const mindarThree = new MindARThree({
-            container: document.querySelector("#ar-container"),
-            // imageTargetSrc: "markers/targets.mind",
-            imageTargetSrc:
-              "https://hiukim.github.io/mind-ar-js-doc/assets/mind-ar/targets.mind",
-            uiLoading: "no", // Isse loading circle gayab ho jayega
-            uiScanning: "yes", // Isse scan karne wala box dikhega
-          });
-          if (!routeSteps[selectedRoute]) {
-            alert("SYSTEM ERROR: ROUTE DATA MISSING.");
-            location.reload();
-          }
-          const currentNodeKey = routeSteps[selectedRoute][currentStep];
-          const targetIndex = markerIndexMap[currentNodeKey];
-          const anchor = mindarThree.addAnchor(targetIndex);
+      if (currentStep >= 6) window.location.href = "final.html";
 
-          // MAGIC FIX: The "Off-By-One" Scavenger Hunt Shift
-          anchor.onTargetFound = () => {
-            const card = document.getElementById("riddle-card");
+      document.addEventListener("DOMContentLoaded", () => {
+        const currentNodeKey = routeSteps[selectedRoute][currentStep];
+        const targetIndex = markerIndexMap[currentNodeKey];
+        const activeAnchor = document.querySelector(`#anchor${targetIndex}`);
 
-            // Step 1 — Show scanning animation
-            card.innerHTML = `
-    <h3 style="color:#00e5ff;font-family:monospace;">
-      TARGET DETECTED
-    </h3>
+        activeAnchor.addEventListener("targetFound", () => {
+          const card = document.getElementById("riddle-card");
+          card.style.display = "block";
 
-    <p style="margin-top:10px;font-family:monospace;">
-      SCANNING NODE...
-    </p>
+          card.innerHTML = `
+                    <h3>TARGET DETECTED</h3>
+                    <p>SCANNING NODE...</p>
+                    <div class="loading-bar-container"><div class="loading-bar-fill"></div></div>
+                    <p>DECRYPTING DATA STREAM...</p>
+                `;
 
-    <div class="loading-bar-container">
-      <div class="loading-bar-fill"></div>
-    </div>
+          setTimeout(() => {
+            if (currentStep < 5) {
+              const nextNodeKey = routeSteps[selectedRoute][currentStep + 1];
+              const textKey = "Route " + selectedRoute;
+              const displayRiddle =
+                riddles[nextNodeKey] && riddles[nextNodeKey][textKey]
+                  ? riddles[nextNodeKey][textKey]
+                  : riddles[nextNodeKey]["ALL_ROUTES"];
 
-    <p style="margin-top:10px;font-family:monospace;">
-      DECRYPTING DATA STREAM
-    </p>
-  `;
+              card.innerHTML = `
+                            <p id="riddle-text">${displayRiddle}</p>
+                            <input type="text" id="node-unlock-code" placeholder="ENTER ACCESS KEY">
+                            <button id="submit-btn">SUBMIT DATA</button>
+                        `;
 
-            card.style.display = "block";
-
-            // Wait for animation
-            setTimeout(() => {
-              let displayRiddle = "";
-
-              // NORMAL NODES
-              if (currentStep < 5) {
-                const nextNodeKey = routeSteps[selectedRoute][currentStep + 1];
-                const textKey = "Route " + selectedRoute;
-
-                if (riddles[nextNodeKey] && riddles[nextNodeKey][textKey]) {
-                  displayRiddle = riddles[nextNodeKey][textKey];
-                } else if (
-                  riddles[nextNodeKey] &&
-                  riddles[nextNodeKey]["ALL_ROUTES"]
-                ) {
-                  displayRiddle = riddles[nextNodeKey]["ALL_ROUTES"];
+              document.getElementById("submit-btn").onclick = () => {
+                const userInput = document
+                  .getElementById("node-unlock-code")
+                  .value.trim()
+                  .toUpperCase();
+                if (userInput === riddleAnswers[nextNodeKey]) {
+                  currentStep++;
+                  localStorage.setItem("bounty_step", currentStep);
+                  location.reload();
                 } else {
-                  displayRiddle =
-                    "SYSTEM LOG: Proceed to " + riddleAnswers[nextNodeKey];
+                  alert("ACCESS DENIED: KEY INCORRECT");
                 }
-
-                card.innerHTML = `
-        <p id="riddle-text">${displayRiddle}</p>
-
-        <input
-          type="text"
-          id="node-unlock-code"
-          placeholder="ENTER ACCESS KEY"
-          style="width:90%;padding:12px;margin-top:15px;background:#000;border:1px solid #00ff00;color:#00ff00;text-align:center;"
-        />
-
-        <button id="submit-btn"
-          style="width:90%;padding:12px;margin-top:10px;background:#00ff00;color:#000;font-weight:bold;">
-          SUBMIT DATA
-        </button>
-      `;
-
-                document.getElementById("submit-btn").onclick = () => {
-                  const userInput = document
-                    .getElementById("node-unlock-code")
-                    .value.trim()
-                    .toUpperCase();
-
-                  const correctAnswer = riddleAnswers[nextNodeKey];
-
-                  if (userInput === correctAnswer) {
-                    currentStep++;
-                    localStorage.setItem("bounty_step", currentStep);
-                    location.reload();
-                  } else {
-                    alert("ACCESS DENIED: KEY INCORRECT");
-                  }
-                };
-              }
-
-              // FINAL NODE (PRINT SHOP)
-              else {
-                card.innerHTML = `
-        <h2 style="color:#00ff00;font-family:monospace;">
-          CORE SECURITY COLLAPSED
-        </h2>
-
-        <p style="margin-top:10px;">
-          PRINT NODE COMPROMISED
-        </p>
-
-        <p style="margin-top:15px;">
-          CONGRATULATIONS AGENT
-        </p>
-
-        <h1 style="color:#ffd700;margin-top:20px;">
-          KEY 03 ACQUIRED
-        </h1>
-
-        <h2 style="color:#00e5ff;margin-top:10px;">
-          DOMINANCE
-        </h2>
-
-        <p style="margin-top:20px;font-size:0.9rem;">
-          PROCEEDING TO FINAL SHUTDOWN...
-        </p>
-      `;
-
-                setTimeout(() => {
-                  localStorage.setItem("bounty_step", 6);
-                  window.location.href = "final.html";
-                }, 3500);
-              }
-            }, 1200);
-          };
-
-          await mindarThree.start();
-          const { renderer, scene, camera } = mindarThree;
-          renderer.setAnimationLoop(() => {
-            renderer.render(scene, camera);
-          });
-        } catch (err) {
-          console.error("Crash Details:", err);
-          alert("CAMERA ERROR: " + err.message);
-        }
+              };
+            } else {
+              card.innerHTML = `<h2>CORE SECURITY COLLAPSED</h2><h1>KEY 03: DOMINANCE</h1>`;
+              setTimeout(() => {
+                localStorage.setItem("bounty_step", 6);
+                window.location.href = "final.html";
+              }, 3500);
+            }
+          }, 1500);
+        });
       });
-
-      // Submit Button Logic
-      document.getElementById("submit-btn").addEventListener("click", () => {
-        const userInput = document
-          .getElementById("node-unlock-code")
-          .value.trim()
-          .toUpperCase();
-        let correctAnswer = "";
-
-        if (currentStep < 5) {
-          const nextNodeKey = routeSteps[selectedRoute][currentStep + 1];
-          correctAnswer = riddleAnswers[nextNodeKey] || "";
-        } else {
-          correctAnswer = "DOMINANCE";
-        }
-
-        // Check the answer for the NEXT location, or the final override key
-        if (currentStep < 5) {
-          const nextNodeKey = routeSteps[selectedRoute][currentStep + 1];
-          correctAnswer = riddleAnswers[nextNodeKey];
-        } else {
-          correctAnswer = "DOMINANCE"; // The final keyword for Round 3
-        }
-
-        if (userInput === correctAnswer) {
-          currentStep++;
-
-          localStorage.setItem("bounty_step", currentStep);
-
-          // If all 6 nodes completed → go to final page
-          if (currentStep >= 6) {
-            localStorage.setItem("hunt_status", "completed");
-
-            window.location.href = "final.html";
-          } else {
-            // Reload to activate next AR marker
-            location.reload();
-          }
-        } else {
-          alert("ACCESS DENIED: KEY INCORRECT");
-        }
-      });
-      function showRiddle() {
-        let displayRiddle = "";
-
-        if (currentStep < 5) {
-          const nextNodeKey = routeSteps[selectedRoute][currentStep + 1];
-          const textKey = "Route " + selectedRoute;
-
-          if (riddles[nextNodeKey] && riddles[nextNodeKey][textKey]) {
-            displayRiddle = riddles[nextNodeKey][textKey];
-          } else if (
-            riddles[nextNodeKey] &&
-            riddles[nextNodeKey]["ALL_ROUTES"]
-          ) {
-            displayRiddle = riddles[nextNodeKey]["ALL_ROUTES"];
-          } else {
-            displayRiddle =
-              "SYSTEM LOG: Proceed to " + riddleAnswers[nextNodeKey];
-          }
-
-          document.getElementById("riddle-card").innerHTML = `
-      <p id="riddle-text">${displayRiddle}</p>
-      <input id="node-unlock-code" placeholder="ENTER ACCESS KEY"/>
-      <button id="submit-btn">SUBMIT DATA</button>
-    `;
-        }
-      }
     </script>
   </body>
 </html>
