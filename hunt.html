@@ -104,9 +104,18 @@ device-orientation-permission-ui="enabled:false"
             }
 
             card.innerHTML = `
-<div id="riddle-text" style="white-space: pre-wrap; word-wrap: break-word; margin-bottom: 15px;">${displayRiddle}</div>
-<input id="answer" placeholder="ENTER ACCESS KEY">
-<button onclick="checkAnswer('${nextNodeKey}')">SUBMIT</button>
+<div id="riddle-text" style="
+    white-space: pre-wrap; 
+    word-wrap: break-word; 
+    word-break: break-all; 
+    margin-bottom: 20px; 
+    font-size: 1rem; 
+    line-height: 1.5;
+    text-align: center;
+    padding: 10px;
+">${displayRiddle}</div>
+<input id="answer" placeholder="ENTER ACCESS KEY" style="display: block; width: 90%; margin: 10px auto;">
+<button onclick="checkAnswer('${nextNodeKey}')" style="display: block; width: 95%; margin: 10px auto;">SUBMIT</button>
 `;
           } else {
             card.innerHTML = `<h2>CORE SECURITY COLLAPSED</h2><h1>KEY 03: DOMINANCE</h1>`;
