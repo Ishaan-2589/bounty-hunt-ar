@@ -164,26 +164,12 @@ device-orientation-permission-ui="enabled:false"
 ">SUBMIT DATA</button>
 `;
           } else {
-            card.innerHTML = `
-<div class="terminal">
-  <p class="terminal-line">[ SYSTEM BREACH DETECTED ]</p>
-  <p class="terminal-line">Decrypting final node...</p>
-
-  <div class="loading-bar-container">
-    <div class="loading-bar-fill"></div>
-  </div>
-
-  <p class="terminal-line glitch">ROGUE AI CORE DESTABILIZING...</p>
-
-  <h2 class="victory">KEY 03 ACQUIRED</h2>
-  <h1 class="key">DOMINANCE</h1>
-</div>
-`;
+            card.innerHTML = `<h2>CORE SECURITY COLLAPSED</h2><h1>KEY 03: DOMINANCE</h1>`;
 
             setTimeout(() => {
               localStorage.setItem("bounty_step", 6);
               window.location.href = "final.html";
-            }, 5000);
+            }, 3000);
           }
         });
       });
