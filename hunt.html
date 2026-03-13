@@ -119,7 +119,10 @@
           console.error("Anchor not found for", currentNodeKey);
           return
         }
+        let detected=false;
         activeAnchor.addEventListener("targetFound", () => {
+          if(detected) return;
+          detected=true;
           const card = document.getElementById("riddle-card");
           card.style.display = "block";
 
@@ -139,8 +142,8 @@
               if (riddles[nextNodeKey]) {
                 if(riddles[nextNodeKey][textKey]){
                   displayRiddle = riddles[nextNodeKey][textKey];
-                } else if (riddles[nextNodeKey]["ALL ROUTES"]) {
-                  displayRiddle = riddles[nextNodeKey]["ALL ROUTES"];
+                } else if (riddles[nextNodeKey]["ALL_ROUTES"]) {
+                  displayRiddle = riddles[nextNodeKey]["ALL_ROUTES"];
                 }
               }
               card.innerHTML = `
