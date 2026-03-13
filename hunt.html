@@ -179,12 +179,15 @@ device-orientation-permission-ui="enabled:false"
           .value.trim()
           .toUpperCase();
 
-        if (val === riddleAnswers[node]) {
+        // Is line se hum check karenge ki user ka input list mein hai ya nahi
+        const possibleAnswers = riddleAnswers[node];
+
+        if (possibleAnswers.includes(val)) {
           currentStep++;
           localStorage.setItem("bounty_step", currentStep);
           location.reload();
         } else {
-          alert("ACCESS DENIED");
+          alert("ACCESS DENIED: INVALID KEYCODE");
         }
       }
     </script>
