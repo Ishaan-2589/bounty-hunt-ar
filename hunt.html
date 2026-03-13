@@ -107,20 +107,19 @@ device-orientation-permission-ui="enabled:false"
 
             card.innerHTML = `
 <div style="text-align: left; margin-bottom: 8px; border-bottom: 1px solid #00ff00; padding-bottom: 5px;">
-    <span style="font-size: 0.7rem; color: #88ff88; letter-spacing: 1px;">[ STATUS: ENCRYPTED_DATA_RECEIVED ]</span>
+    <span style="font-size: 0.7rem; color: #88ff88; letter-spacing: 1px;">[ STATUS: DATA_RECOVERY_SUCCESS ]</span>
 </div>
 
 <div style="
     width: 100%;
-    min-height: 200px; /* Aur bada box taaki lambi riddles fit ho sakein */
+    min-height: 180px; 
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center;
     margin-bottom: 15px;
-    background: rgba(0, 40, 0, 0.2);
-    padding: 10px;
+    background: rgba(0, 40, 0, 0.3);
+    padding: 15px; /* Increased padding */
     box-sizing: border-box;
-    border: 1px solid rgba(0, 255, 0, 0.1);
 ">
     <p style="font-size: 0.8rem; color: #00ff00; margin: 0 0 10px 0; text-align: left; font-weight: bold;">
         > MISSION_LOG:
@@ -128,10 +127,10 @@ device-orientation-permission-ui="enabled:false"
     
     <div id="riddle-text" style="
         white-space: pre-wrap; 
-        word-wrap: break-word; 
-        word-break: break-all; 
-        font-size: 0.95rem; 
-        line-height: 1.5;
+        overflow-wrap: anywhere; /* Hard break for long strings */
+        word-wrap: break-word;
+        font-size: 0.9rem; 
+        line-height: 1.8; /* Increased line height for Morse code */
         color: #ffffff;
         text-align: center;
         width: 100%;
@@ -142,25 +141,24 @@ device-orientation-permission-ui="enabled:false"
 
 <div style="width: 100%;">
     <input id="answer" placeholder="ENTER ACCESS KEY" style="
-        width: 90%; 
+        width: 100%; /* Full width within container padding */
         padding: 12px; 
         background: #000; 
         border: 1px solid #00ff00; 
         color: #00ff00; 
         margin-bottom: 12px;
         text-align: center;
-        font-family: 'Courier New', monospace;
-        text-transform: uppercase;
+        box-sizing: border-box;
     ">
 
     <button onclick="checkAnswer('${nextNodeKey}')" style="
-        width: 95%; 
+        width: 100%; 
         padding: 14px; 
         background: #00ff00; 
         color: #000; 
         font-weight: bold;
-        letter-spacing: 2px;
         text-transform: uppercase;
+        box-sizing: border-box;
     ">SUBMIT DATA</button>
 </div>
 `;
