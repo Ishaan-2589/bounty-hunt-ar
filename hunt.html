@@ -1,77 +1,72 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RECONNAISSANCE UNIT</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
+    <script src="js/riddles.js"></script>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RECONNAISSANCE UNIT</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        background: #000;
+        font-family: monospace;
+      }
 
-<script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
-<script src="js/riddles.js"></script>
+      #card {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #001100;
+        border: 2px solid #00ff00;
+        padding: 20px;
+        color: #00ff00;
+        z-index: 10000;
+        text-align: center;
+        width: 85%;
+        max-width: 380px;
+      }
 
-<style>
+      input {
+        width: 90%;
+        padding: 10px;
+        margin: 10px 0;
+        background: #000;
+        border: 1px solid #00ff00;
+        color: #00ff00;
+        text-align: center;
+      }
 
-body{
-margin:0;
-overflow:hidden;
-background:#000;
-font-family:monospace;
-}
+      button {
+        width: 95%;
+        padding: 12px;
+        background: #00ff00;
+        border: none;
+        font-weight: bold;
+        cursor: pointer;
+      }
+    </style>
+  </head>
 
-#card{
-display:none;
-position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-background:#001100;
-border:2px solid #00ff00;
-padding:20px;
-color:#00ff00;
-z-index:10000;
-text-align:center;
-width:85%;
-max-width:380px;
-}
+  <body>
+    <div id="card"></div>
 
-input{
-width:90%;
-padding:10px;
-margin:10px 0;
-background:#000;
-border:1px solid #00ff00;
-color:#00ff00;
-text-align:center;
-}
+    <script>
+      const selectedRoute = localStorage.getItem("bounty_route") || "A";
+      let currentStep = parseInt(localStorage.getItem("bounty_step")) || 0;
 
-button{
-width:95%;
-padding:12px;
-background:#00ff00;
-border:none;
-font-weight:bold;
-cursor:pointer;
-}
+      if (currentStep >= 6) {
+        window.location.href = "final.html";
+      }
 
-</style>
-</head>
+      const currentNodeKey = routeSteps[selectedRoute][currentStep];
 
-<body>
-
-<div id="card"></div>
-
-<script>
-
-const selectedRoute = localStorage.getItem("bounty_route") || "A";
-let currentStep = parseInt(localStorage.getItem("bounty_step")) || 0;
-
-if(currentStep >= 6){
-window.location.href="final.html";
-}
-
-const currentNodeKey = routeSteps[selectedRoute][currentStep];
-
-document.write(`
+      document.write(`
 
 <a-scene
 mindar-image="imageTargetSrc: markers/${currentNodeKey}.mind; autoStart:true; uiScanning:yes;"
@@ -87,73 +82,57 @@ device-orientation-permission-ui="enabled:false"
 
 `);
 
-document.addEventListener("DOMContentLoaded",()=>{
+      document.addEventListener("DOMContentLoaded", () => {
+        const anchor = document.querySelector("#target");
 
-const anchor=document.querySelector("#target");
+        anchor.addEventListener("targetFound", () => {
+          const card = document.getElementById("card");
+          card.style.display = "block";
 
-anchor.addEventListener("targetFound",()=>{
+          if (currentStep < 5) {
+            const nextNodeKey = routeSteps[selectedRoute][currentStep + 1];
+            const textKey = "Route " + selectedRoute;
 
-const card=document.getElementById("card");
-card.style.display="block";
+            let displayRiddle = "RIDDLE ERROR";
 
-if(currentStep < 5){
+            if (riddles[nextNodeKey]) {
+              if (riddles[nextNodeKey][textKey]) {
+                displayRiddle = riddles[nextNodeKey][textKey];
+              } else if (riddles[nextNodeKey]["ALL_ROUTES"]) {
+                displayRiddle = riddles[nextNodeKey]["ALL_ROUTES"];
+              }
+            }
 
-const nextNodeKey = routeSteps[selectedRoute][currentStep+1];
-const textKey = "Route " + selectedRoute;
-
-let displayRiddle="RIDDLE ERROR";
-
-if(riddles[nextNodeKey]){
-
-if(riddles[nextNodeKey][textKey]){
-displayRiddle=riddles[nextNodeKey][textKey];
-}
-else if(riddles[nextNodeKey]["ALL_ROUTES"]){
-displayRiddle=riddles[nextNodeKey]["ALL_ROUTES"];
-}
-
-}
-
-card.innerHTML=`
-<p>${displayRiddle}</p>
+            card.innerHTML = `
+<div id="riddle-text" style="white-space: pre-wrap; word-wrap: break-word; margin-bottom: 15px;">${displayRiddle}</div>
 <input id="answer" placeholder="ENTER ACCESS KEY">
 <button onclick="checkAnswer('${nextNodeKey}')">SUBMIT</button>
 `;
+          } else {
+            card.innerHTML = `<h2>CORE SECURITY COLLAPSED</h2><h1>KEY 03: DOMINANCE</h1>`;
 
-}else{
+            setTimeout(() => {
+              localStorage.setItem("bounty_step", 6);
+              window.location.href = "final.html";
+            }, 3000);
+          }
+        });
+      });
 
-card.innerHTML=`<h2>CORE SECURITY COLLAPSED</h2><h1>KEY 03: DOMINANCE</h1>`;
+      function checkAnswer(node) {
+        const val = document
+          .getElementById("answer")
+          .value.trim()
+          .toUpperCase();
 
-setTimeout(()=>{
-localStorage.setItem("bounty_step",6);
-window.location.href="final.html";
-},3000);
-
-}
-
-});
-
-});
-
-function checkAnswer(node){
-
-const val=document.getElementById("answer").value.trim().toUpperCase();
-
-if(val === riddleAnswers[node]){
-
-currentStep++;
-localStorage.setItem("bounty_step",currentStep);
-location.reload();
-
-}else{
-
-alert("ACCESS DENIED");
-
-}
-
-}
-
-</script>
-
-</body>
+        if (val === riddleAnswers[node]) {
+          currentStep++;
+          localStorage.setItem("bounty_step", currentStep);
+          location.reload();
+        } else {
+          alert("ACCESS DENIED");
+        }
+      }
+    </script>
+  </body>
 </html>
