@@ -253,6 +253,7 @@ button:hover {
     left: 50%;                     /* Centers it horizontally */
     transform: translate(-50%, -50%); /* Perfectly aligns the center */
     width: 90%;                    /* Ensures it fits on mobile screens */
+    max-width: 450px;              /* Keeps it from being too wide on desktops */
     word-wrap: break-word;
     overflow-wrap: break-word;
     white-space: normal;
