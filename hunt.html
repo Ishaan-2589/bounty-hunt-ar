@@ -111,13 +111,14 @@ device-orientation-permission-ui="enabled:false"
 </div>
 
 <div style="
-    width: 100%;
-    min-height: 120px; /* Box ka size chhota kar diya */
+    width: 90%;
+    max-width: 300px;
+    min-height: 110px; /* Box ka size chhota kar diya */
+    margin: 0 auto 12px auto;
     display: flex;
     flex-direction: column;
     justify-content: center; /* Vertically center */
     align-items: center;    /* Horizontally center */
-    margin-bottom: 12px;
     background: rgba(0, 40, 0, 0.2);
     box-sizing: border-box;
 ">
@@ -127,12 +128,12 @@ device-orientation-permission-ui="enabled:false"
     
     <div id="riddle-text" style="
         white-space: pre-wrap; 
-        overflow-wrap: anywhere; 
-        word-break: break-all; 
-        font-size: 0.85rem; /* Font thoda aur chhota taaki wrap sahi ho */
+        overflow-wrap: break-word; 
+        word-break:normal; 
+        font-size: 0.9rem; 
         line-height: 1.6;
         color: #ffffff;
-        text-align: center; /* Text alignment center lock */
+        text-align: center; 
         width: 100%;
         padding: 0 5px;
     ">

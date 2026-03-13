@@ -351,6 +351,8 @@ button:hover {
 }
 
 #riddle-text {
+    font-family: monospace;
+    letter-spacing: 1px;
     font-size: 0.9rem;
     line-height: 1.4;
     text-align: center;
